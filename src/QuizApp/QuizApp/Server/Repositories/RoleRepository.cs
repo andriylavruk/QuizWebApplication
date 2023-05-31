@@ -24,6 +24,11 @@ public class RoleRepository : IRoleRepository
         return await _context.Roles.SingleOrDefaultAsync(r => r.Id == id);
     }
 
+    public async Task<Role?> GetRoleByNameAsync(string roleName)
+    {
+        return await _context.Roles.SingleOrDefaultAsync(r => r.Name == roleName);
+    }
+
     public async Task<bool> CreateRoleAsync(Role role)
     {
         if (role != null)
@@ -63,8 +68,6 @@ public class RoleRepository : IRoleRepository
     {
         if (role != null)
         {
-            var userDb = await GetRoleByIdAsync(role.Id);
-
             _context.Remove(role!);
             await _context.SaveChangesAsync();
 

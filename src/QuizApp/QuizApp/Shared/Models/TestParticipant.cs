@@ -8,5 +8,4 @@ public class TestParticipant
     public Guid TestId { get; set; }
     public Test? Test { get; set; }
     public int Grade { get; set; } = 0;
-    public IEnumerable<TestResult> TestResults { get; set; } = Enumerable.Empty<TestResult>();
 }

@@ -7,5 +7,4 @@ public class Question
     public Guid TestId { get; set; }
     public Test? Test { get; set; }
     public IEnumerable<Answer> Answers { get; set; } = Enumerable.Empty<Answer>();
-    public int Number { get; set; }
 }

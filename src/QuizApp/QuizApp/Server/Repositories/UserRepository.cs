@@ -35,50 +35,6 @@ public class UserRepository : IUserRepository
             .SingleOrDefaultAsync(u => u.Email == email);
     }
 
-    public async Task<bool> IsActivatedUserAsync(Guid id)
-    {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
-
-        if (user == null)
-        {
-            throw new Exception();
-        }
-
-        return user.IsActivated;
-    }
-
-    public async Task<bool> ActivateUserAsync(Guid id)
-    {
-        var user = await GetUserByIdAsync(id);
-
-        if (user == null)
-        {
-            return false;
-        }
-
-        user.IsActivated = true;
-
-        var activated = await _context.SaveChangesAsync();
-
-        return activated > 0;
-    }
-
-    public async Task<bool> DeActivateUserAsync(Guid id)
-    {
-        var user = await GetUserByIdAsync(id);
-
-        if (user == null)
-        {
-            return false;
-        }
-
-        user.IsActivated = false;
-
-        var deactivated = await _context.SaveChangesAsync();
-
-        return deactivated > 0;
-    }
-
     public async Task<bool> SetUserRole(User user, Role role)
     {
         var userInDB = await GetUserByIdAsync(user.Id);
