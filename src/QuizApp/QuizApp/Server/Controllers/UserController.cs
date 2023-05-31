@@ -5,82 +5,81 @@ using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.DTO;
 using QuizApp.Shared.Models;
 
-namespace QuizApp.Server.Controllers
+namespace QuizApp.Server.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+//[Authorize(Roles = "Administrator")]
+public class UserController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize(Roles = "Administrator")]
-    public class UserController : ControllerBase
+    private readonly IUserRepository _userRepository;
+    private readonly IRoleRepository _roleRepository;
+    private readonly IMapper _mapper;
+
+    public UserController(IUserRepository userRepository, IRoleRepository roleRepository, IMapper mapper)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IRoleRepository _roleRepository;
-        private readonly IMapper _mapper;
+        _userRepository = userRepository;
+        _roleRepository = roleRepository;
+        _mapper = mapper;
+    }
 
-        public UserController(IUserRepository userRepository, IRoleRepository roleRepository, IMapper mapper)
+    [HttpGet]
+    public async Task<ActionResult<List<User>>> GetAllUsers()
+    {
+        var users = await _userRepository.GetAllUsersAsync();
+        var result = _mapper.Map<List<UserDTO>>(users);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<User>> GetUserById(Guid id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        var mappedUser = _mapper.Map<UserDTO>(user);
+
+        if (user == null)
         {
-            _userRepository = userRepository;
-            _roleRepository = roleRepository;
-            _mapper = mapper;
+            return NotFound();
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
-        {
-            var users = await _userRepository.GetAllUsersAsync();
-            var result = _mapper.Map<List<UserDTO>>(users);
+        return Ok(mappedUser);
+    }
 
-            return Ok(result);
+    [HttpGet("role")]
+    public async Task<ActionResult<List<Role>>> GetAllRoles()
+    {
+        var roles = await _roleRepository.GetAllRolesAsync();
+
+        return Ok(roles);
+    }
+
+    [HttpGet("role/{id:guid}")]
+    public async Task<ActionResult<Role>> GetRoleById(Guid id)
+    {
+        var role = await _roleRepository.GetRoleByIdAsync(id);
+
+        if (role == null)
+        {
+            return NotFound();
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<ActionResult<User>> GetUserById(Guid id)
+        return Ok(role);
+    }
+
+    [HttpPost("setrole/{userId:guid}/{roleId:guid}")]
+    public async Task<IActionResult> SetUserRole(Guid userId, Guid roleId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+        var role = await _roleRepository.GetRoleByIdAsync(roleId);
+
+        if (user == null || role == null)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
-            var mappedUser = _mapper.Map<UserDTO>(user);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(mappedUser);
+            return NotFound();
         }
 
-        [HttpGet("role")]
-        public async Task<ActionResult<List<Role>>> GetAllRoles()
-        {
-            var roles = await _roleRepository.GetAllRolesAsync();
+        await _userRepository.SetUserRole(user, role);
 
-            return Ok(roles);
-        }
-
-        [HttpGet("role/{id:guid}")]
-        public async Task<ActionResult<Role>> GetRoleById(Guid id)
-        {
-            var role = await _roleRepository.GetRoleByIdAsync(id);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(role);
-        }
-
-        [HttpPost("setrole/{userId:guid}/{roleId:guid}")]
-        public async Task<IActionResult> SetUserRole(Guid userId, Guid roleId)
-        {
-            var user = await _userRepository.GetUserByIdAsync(userId);
-            var role = await _roleRepository.GetRoleByIdAsync(roleId);
-
-            if (user == null || role == null)
-            {
-                return NotFound();
-            }
-
-            await _userRepository.SetUserRole(user, role);
-
-            return Ok();
-        }
+        return Ok();
     }
 }
