@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
 
@@ -6,7 +7,7 @@ namespace QuizApp.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-//[Authorize(Roles = "Administrator")]
+[Authorize(Roles = "Administrator")]
 public class GroupController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
@@ -93,7 +94,7 @@ public class GroupController : ControllerBase
         return NotFound();
     }
 
-    [HttpPost("setrole/{userId:guid}/{groupId:guid}")]
+    [HttpPost("setusergroup/{userId:guid}/{groupId:guid}")]
     public async Task<IActionResult> SetUserGroup(Guid userId, Guid groupId)
     {
         var user = await _userRepository.GetUserByIdAsync(userId);

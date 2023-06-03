@@ -7,5 +7,7 @@ public class TestParticipant
     public User? User { get; set; }
     public Guid TestId { get; set; }
     public Test? Test { get; set; }
-    public int Grade { get; set; } = 0;
+    public DateTime? StartedAt { get; set; } = null;
+    public DateTime? FinishedAt { get; set; } = null;
+    public int? Grade { get; set; } = null;
 }

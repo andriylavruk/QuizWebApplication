@@ -85,6 +85,7 @@ public class AuthController : ControllerBase
     {
         List<Claim> claims = new List<Claim>
         {
+            new Claim (ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim (ClaimTypes.Email, user.Email),
             new Claim (ClaimTypes.Role, user.Role!.Name),
             new Claim (ClaimTypes.Name, user.FirstName),

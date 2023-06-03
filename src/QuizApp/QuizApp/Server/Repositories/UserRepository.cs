@@ -2,16 +2,19 @@
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
+using System.Security.Claims;
 
 namespace QuizApp.Server.Repositories;
 
 public class UserRepository : IUserRepository
 {
     private readonly DataContext _context;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserRepository(DataContext context)
+    public UserRepository(DataContext context, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<List<User>> GetAllUsersAsync()
@@ -28,6 +31,13 @@ public class UserRepository : IUserRepository
             .Include(x => x.Role)
             .Include(x => x.Group)
             .SingleOrDefaultAsync(r => r.Id == id);
+    }
+
+    public async Task<List<User>> GetUsersByGroupIdAsync(Guid groupId)
+    {
+        return await _context.Users
+            .Where(x => x.GroupId == groupId)
+            .ToListAsync();
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)
@@ -104,5 +114,17 @@ public class UserRepository : IUserRepository
         {
             return false;
         }
+    }
+
+    public Guid GetCurrentUserId()
+    {
+        var id = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (id == null)
+        {
+            return Guid.Empty;
+        }
+
+        return new Guid(id);
     }
 }
