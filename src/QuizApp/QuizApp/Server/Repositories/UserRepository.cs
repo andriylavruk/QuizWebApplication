@@ -30,7 +30,7 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .Include(x => x.Role)
             .Include(x => x.Group)
-            .SingleOrDefaultAsync(r => r.Id == id);
+            .FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<List<User>> GetUsersByGroupIdAsync(Guid groupId)
@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Include(x => x.Role)
-            .SingleOrDefaultAsync(u => u.Email == email);
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<bool> SetUserRole(User user, Role role)

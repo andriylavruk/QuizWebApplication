@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QuizApp.Server.Repositories;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
 
@@ -12,14 +13,19 @@ public class QuestionController : ControllerBase
 {
     private readonly IQuestionRepository _questionRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ITestParticipantRepository _testParticipantRepository;
 
-    public QuestionController(IQuestionRepository questionRepository, IUserRepository userRepository)
+    public QuestionController(IQuestionRepository questionRepository, 
+        IUserRepository userRepository, 
+        ITestParticipantRepository testParticipantRepository)
     {
         _questionRepository = questionRepository; ;
         _userRepository = userRepository;
+        _testParticipantRepository = testParticipantRepository;
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<List<Question>>> GetAllQuestions()
     {
         var questions = await _questionRepository.GetAllQuestionsAsync();
@@ -28,15 +34,22 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet]
-    [Route("/questionsForTestParticipant")]
+    [Route("/questionsForTestParticipant/{testId:guid}")]
     [Authorize(Roles = "Student")]
-    public async Task<ActionResult<List<Question>>> GetQuestionsForTestParticipant()
+    public async Task<ActionResult<List<Question>>> GetQuestionsForTestParticipantByTestId(Guid testId)
     {
         var currentUserId = _userRepository.GetCurrentUserId();
 
-        var questions = await _questionRepository.GetQuestionsForTestParticipantAsync(currentUserId);
+        var participant = await _testParticipantRepository.GetTestParticipantByTestIdAsync(testId);
 
-        return Ok(questions);
+        if (participant!.UserId != currentUserId)
+        {
+            return BadRequest("This user does not have access to these questions.");
+        }
+
+        var questionsForTestParticipant = await _questionRepository.GetQuestionsForTestParticipantAsync(participant!.Id);
+
+        return Ok(questionsForTestParticipant);
     }
 
     [HttpGet]

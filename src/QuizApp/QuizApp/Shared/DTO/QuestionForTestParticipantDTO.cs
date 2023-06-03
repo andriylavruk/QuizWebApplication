@@ -8,5 +8,5 @@ public class QuestionForTestParticipantDTO
     public string Description { get; set; } = string.Empty;
     public Guid TestId { get; set; }
     public Test? Test { get; set; }
-    public string[] Options { get; set; } = new string[] {};
+    public List<string> Options { get; set; } = new List<string>();
 }

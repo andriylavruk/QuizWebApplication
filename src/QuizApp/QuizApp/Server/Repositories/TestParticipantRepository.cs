@@ -24,7 +24,14 @@ public class TestParticipantRepository : ITestParticipantRepository
 
     public async Task<TestParticipant?> GetTestParticipantByIdAsync(Guid id)
     {
-        return await _context.TestParticipants.SingleOrDefaultAsync(r => r.Id == id);
+        return await _context.TestParticipants.FirstOrDefaultAsync(r => r.Id == id);
+    }
+
+    public async Task<TestParticipant?> GetTestParticipantByTestIdAsync(Guid testId)
+    {
+        return await _context.TestParticipants
+            .Include(x => x.Test)
+            .FirstOrDefaultAsync(x => x.TestId == testId);
     }
 
     public async Task<bool> IsTestParticipantExistAsync(Guid id)

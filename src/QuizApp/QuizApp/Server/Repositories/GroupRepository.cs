@@ -21,12 +21,12 @@ public class GroupRepository : IGroupRepository
 
     public async Task<Group?> GetGroupByIdAsync(Guid id)
     {
-        return await _context.Groups.SingleOrDefaultAsync(r => r.Id == id);
+        return await _context.Groups.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<Group?> GetGroupByNameAsync(string groupName)
     {
-        return await _context.Groups.SingleOrDefaultAsync(r => r.Name == groupName);
+        return await _context.Groups.FirstOrDefaultAsync(r => r.Name == groupName);
     }
 
     public async Task<bool> IsGroupExistAsync(Guid id)

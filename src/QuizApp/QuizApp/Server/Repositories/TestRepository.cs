@@ -41,7 +41,7 @@ public class TestRepository : ITestRepository
 
     public async Task<Test?> GetTestByIdAsync(Guid id)
     {
-        return await _context.Tests.SingleOrDefaultAsync(r => r.Id == id);
+        return await _context.Tests.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<bool> IsTestExistAsync(Guid id)

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuizApp.Server.Repositories.Interfaces;
+using QuizApp.Shared.DTO;
 using QuizApp.Shared.Models;
 
 namespace QuizApp.Server.Controllers;
@@ -12,14 +14,25 @@ public class TestController : ControllerBase
 {
     private readonly ITestRepository _testRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ITestParticipantRepository _testParticipantRepository;
+    private readonly IQuestionRepository _questionRepository;
+    private readonly IMapper _mapper;
 
-    public TestController(ITestRepository testRepository, IUserRepository userRepository)
+    public TestController(ITestRepository testRepository,
+        IUserRepository userRepository,
+        ITestParticipantRepository testParticipantRepository,
+        IQuestionRepository questionRepository,
+        IMapper mapper)
     {
         _testRepository = testRepository;
         _userRepository = userRepository;
+        _testParticipantRepository = testParticipantRepository;
+        _questionRepository = questionRepository;
+        _mapper = mapper;
     }
 
     [HttpGet]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<List<Test>>> GetAllTests()
     {
         var tests = await _testRepository.GetAllTestsAsync();
@@ -28,15 +41,105 @@ public class TestController : ControllerBase
     }
 
     [HttpGet]
-    [Route("/testsForUser")]
+    [Route("/testsForUser/")]
     [Authorize(Roles = "Student")]
-    public async Task<ActionResult<List<Test>>> GetTestsForTestUser()
+    public async Task<ActionResult<List<Test>>> GetTestsForUser()
     {
         var currentUserId = _userRepository.GetCurrentUserId();
 
         var tests = await _testRepository.GetTestsForUserAsync(currentUserId);
 
         return Ok(tests);
+    }
+
+    [HttpGet]
+    [Route("/startTest/{testId:guid}")]
+    [Authorize(Roles = "Student")]
+    public async Task<ActionResult<List<QuestionForTestParticipantDTO>>> StartTest(Guid testId)
+    {
+        var currentUserId = _userRepository.GetCurrentUserId();
+        var test = await _testRepository.GetTestByIdAsync(testId);
+
+        if (test == null)
+        {
+            return BadRequest();
+        }
+
+        var participant = await _testParticipantRepository.GetTestParticipantByTestIdAsync(testId);
+        var questionsForTestParticipant = await _questionRepository.GetQuestionsForTestParticipantAsync(participant!.Id);
+
+        if (currentUserId != participant!.UserId || test.Id != participant.TestId)
+        {
+            return BadRequest("This user does not have access to this test.");
+        }
+
+        if (participant.FinishedAt != null)
+        {
+            return BadRequest("The test has already been passed.");
+        }
+
+        if(participant.StartedAt == null)
+        {
+            participant.StartedAt = DateTime.UtcNow;
+        }
+
+        await _testParticipantRepository.UpdateTestParticipantAsync(participant, currentUserId);
+
+        return Ok(questionsForTestParticipant);
+    }
+
+    [HttpPost]
+    [Route("/finishTest/{testId:guid}")]
+    [Authorize(Roles = "Student")]
+    public async Task<ActionResult<List<TestResultDTO>>> FinishTest(Guid testId, AnswersToQuestionsDTO answersToQuestionsDTO)
+    {
+        var currentUserId = _userRepository.GetCurrentUserId();
+        var test = await _testRepository.GetTestByIdAsync(testId);
+
+        if (test == null)
+        {
+            return BadRequest();
+        }
+
+        var participant = await _testParticipantRepository.GetTestParticipantByTestIdAsync(testId);
+
+        if (testId != answersToQuestionsDTO.TestId
+            || answersToQuestionsDTO.TestId != participant!.TestId
+            || participant.UserId != currentUserId
+            || answersToQuestionsDTO.UserId != participant.UserId
+            || test.Id != participant.TestId)
+        {
+            return BadRequest("This user does not have access to this test.");
+        }
+
+        var questionsForTestParticipant = await _questionRepository.GetQuestionsForTestParticipantAsync(participant!.Id);
+
+        if (participant.StartedAt == null)
+        {
+            return BadRequest("The test has not yet started.");
+        }
+
+        if(participant.FinishedAt != null)
+        {
+            return BadRequest("The test has already been completed.");
+        }
+
+        var grade = await _questionRepository.CalculateGrade(answersToQuestionsDTO);
+
+        participant.FinishedAt = DateTime.UtcNow;
+        participant.Grade = grade;
+
+        await _testParticipantRepository.UpdateTestParticipantAsync(participant, currentUserId);
+
+        var testResult = new TestResultDTO
+        {
+            User = _mapper.Map<UserDTO>(await _userRepository.GetUserByIdAsync(currentUserId)),
+            Test = test,
+            Grade = grade,
+            NumberOfQuestions = questionsForTestParticipant.Count
+        };
+
+        return Ok(testResult);
     }
 
     [HttpGet]

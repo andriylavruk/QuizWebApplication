@@ -9,6 +9,7 @@ namespace QuizApp.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Administrator")]
 public class TestParticipantController : ControllerBase
 {
     private readonly ITestParticipantRepository _testParticipantRepository;
@@ -32,7 +33,6 @@ public class TestParticipantController : ControllerBase
 
     [HttpGet]
     [Route("participants/{groupId:guid}")]
-    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<List<TestParticipant>>> GetTestParticipantsByGroupId(Guid groupId)
     {
         var group = await _groupRepository.GetGroupByIdAsync(groupId);
@@ -47,7 +47,6 @@ public class TestParticipantController : ControllerBase
 
     [HttpGet]
     [Route("{id:guid}")]
-    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> GetTestParticipantById(Guid id)
     {
         var testParticipant = await _testParticipantRepository.GetTestParticipantByIdAsync(id);
@@ -61,7 +60,6 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpPost("addtestparticipants/{testId:guid}/{groupId:guid}")]
-    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> AddTestParticipantsByGroup(Guid testId, Guid groupId)
     {
         var test = await _testRepository.GetTestByIdAsync(testId);
@@ -78,7 +76,6 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpPut]
-    [Authorize(Roles = "Student")]
     public async Task<IActionResult> UpdateTest(TestParticipantInformationDTO testParticipantDTO)
     {
         var currentUserId = _userRepository.GetCurrentUserId();
@@ -97,7 +94,6 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpDelete("{testId:guid}/{groupId:guid}")]
-    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteTestParticipant(Guid testId, Guid groupId)
     {
 

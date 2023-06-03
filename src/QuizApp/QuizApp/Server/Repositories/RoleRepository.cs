@@ -21,12 +21,12 @@ public class RoleRepository : IRoleRepository
 
     public async Task<Role?> GetRoleByIdAsync(Guid id)
     {
-        return await _context.Roles.SingleOrDefaultAsync(r => r.Id == id);
+        return await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<Role?> GetRoleByNameAsync(string roleName)
     {
-        return await _context.Roles.SingleOrDefaultAsync(r => r.Name == roleName);
+        return await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
     }
 
     public async Task<bool> CreateRoleAsync(Role role)

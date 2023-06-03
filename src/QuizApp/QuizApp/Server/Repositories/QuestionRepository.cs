@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging.Signing;
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.DTO;
@@ -22,10 +23,10 @@ public class QuestionRepository : IQuestionRepository
             .ToListAsync();
     }
 
-    public async Task<List<QuestionForTestParticipantDTO>> GetQuestionsForTestParticipantAsync(Guid id)
+    public async Task<List<QuestionForTestParticipantDTO>> GetQuestionsForTestParticipantAsync(Guid testParticipantId)
     {
         var participant = await _context.TestParticipants
-            .FirstOrDefaultAsync(x => x.UserId == id);
+            .FirstOrDefaultAsync(x => x.Id == testParticipantId);
 
         if (participant == null)
         {
@@ -41,7 +42,7 @@ public class QuestionRepository : IQuestionRepository
                 Description = ques.Description,
                 TestId = ques.TestId,
                 Test = ques.Test,
-                Options = new string[]
+                Options = new List<string>()
                 {
                     ques.Option1,
                     ques.Option2,
@@ -62,7 +63,7 @@ public class QuestionRepository : IQuestionRepository
 
     public async Task<Question?> GetQuestionByIdAsync(Guid id)
     {
-        return await _context.Questions.SingleOrDefaultAsync(r => r.Id == id);
+        return await _context.Questions.FirstOrDefaultAsync(r => r.Id == id);
     }
 
     public async Task<bool> IsQuestionExistAsync(Guid id)
@@ -73,6 +74,25 @@ public class QuestionRepository : IQuestionRepository
             .FirstOrDefaultAsync(x => x.Id == id);
 
         return question != null;
+    }
+
+    public async Task<int> CalculateGrade(AnswersToQuestionsDTO answersToQuestionsDTO)
+    {
+        var questions = await _context.Questions
+            .Where(x => x.TestId == answersToQuestionsDTO.TestId)
+            .ToListAsync();
+
+        var grade = 0;
+
+        foreach(var (x, y) in questions.Zip(answersToQuestionsDTO.Answers))
+        {
+            if(x.RightAnswer == y)
+            {
+                grade++;
+            }
+        }
+
+        return grade;
     }
 
     public async Task<bool> CreateQuestionAsync(Question question)
