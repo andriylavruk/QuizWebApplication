@@ -63,6 +63,11 @@ public class GroupService : IGroupService
 
     public async Task SetUserGroup(Guid userId, Guid groupId)
     {
-        var result = await _httpClient.PostAsync($"api/group/setusergroup/{userId:guid}/{groupId:guid}", null);
+        var result = await _httpClient.PostAsync($"api/group/setusergroup/{userId}/{groupId}", null);
+    }
+
+    public async Task UnsetUserGroup(Guid userId)
+    {
+        var result = await _httpClient.PostAsync($"api/group/unsetusergroup/{userId}", null);
     }
 }

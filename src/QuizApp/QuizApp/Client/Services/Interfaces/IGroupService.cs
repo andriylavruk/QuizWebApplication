@@ -12,4 +12,5 @@ public interface IGroupService
     Task UpdateGroup(Group group);
     Task DeleteGroup(Guid id);
     Task SetUserGroup(Guid userId, Guid groupId);
+    Task UnsetUserGroup(Guid userId);
 }

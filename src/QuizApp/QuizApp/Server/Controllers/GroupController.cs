@@ -109,4 +109,19 @@ public class GroupController : ControllerBase
 
         return Ok();
     }
+
+    [HttpPost("unsetusergroup/{userId:guid}")]
+    public async Task<IActionResult> UnsetUserGroup(Guid userId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        await _groupRepository.UnsetUserGroup(user);
+
+        return Ok();
+    }
 }

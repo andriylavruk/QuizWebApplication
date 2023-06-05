@@ -1,11 +1,18 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.Models;
 
-namespace QuizApp.Client.Pages.GroupPages;
+namespace QuizApp.Client.Pages.UserPages;
 
-public class GroupsBase : ComponentBase
+public class GroupUsersBase : ComponentBase
 {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    [Inject]
+    public IUserService userService { get; set; }
+
     [Inject]
     public IGroupService groupService { get; set; }
 
@@ -14,6 +21,8 @@ public class GroupsBase : ComponentBase
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
+
+    public Group? Group { get; set; }
 
     protected bool _signInSuccessful = false;
 
@@ -28,7 +37,8 @@ public class GroupsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await groupService.GetAllGroups();
+                await userService.GetUsersByGroupId(Id);
+                Group = await groupService.GetGroupById(Id);
             }
             else
             {
@@ -41,25 +51,10 @@ public class GroupsBase : ComponentBase
         }
     }
 
-    protected void ShowGroup(Guid id)
+    protected async Task DeleteUserFromGroup(Guid userId)
     {
-        NavigationManager.NavigateTo($"group/{id}");
-    }
-
-    protected void ShowGroupUsers(Guid groupId)
-    {
-        NavigationManager.NavigateTo($"/groupusers/{groupId}");
-    }
-
-    protected void CreateEditGroup()
-    {
-        NavigationManager.NavigateTo("/group");
-    }
-
-    protected async Task DeleteGroup(Guid id)
-    {
-        await groupService.DeleteGroup(id);
-        await groupService.GetAllGroups();
-        NavigationManager.NavigateTo("/groups");
+        await groupService.UnsetUserGroup(userId);
+        await groupService.GetGroupById(Id);
+        NavigationManager.NavigateTo($"/groupusers/{Id}", true);
     }
 }

@@ -55,6 +55,22 @@ public class GroupRepository : IGroupRepository
         return result > 0;
     }
 
+    public async Task<bool> UnsetUserGroup(User user)
+    {
+        var userInDB = await _context.Users.FirstOrDefaultAsync(x => x.Id == user.Id);
+
+        if (user == null || userInDB == null)
+        {
+            return false;
+        }
+
+        userInDB.Group = null;
+        userInDB.GroupId = null;
+        var result = await _context.SaveChangesAsync();
+
+        return result > 0;
+    }
+
     public async Task<bool> CreateGroupAsync(Group group)
     {
         if (group != null)

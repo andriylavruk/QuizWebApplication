@@ -17,7 +17,7 @@
                 <span class="oi oi-home" aria-hidden="true"></span> Головна
             </NavLink>
         </div>
-        <AuthorizeView>
+        <AuthorizeView Roles="Administrator">
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="counter">
@@ -29,12 +29,16 @@
                         <span class="oi oi-spreadsheet" aria-hidden="true"></span> Групи
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link text-danger" href="register" @onclick="SignOut">
-                        <span class="oi oi-account-logout " aria-hidden="true"></span> Вийти
-                    </NavLink>
-                </div>
             </Authorized>
+        </AuthorizeView>
+        <AuthorizeView>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link text-danger" href="register" @onclick="SignOut">
+                    <span class="oi oi-account-logout " aria-hidden="true"></span> Вийти
+                </NavLink>
+            </div>
+        </AuthorizeView>
+        <AuthorizeView>
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="fetchdata" >

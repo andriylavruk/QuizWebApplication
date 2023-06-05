@@ -82,4 +82,12 @@ public class UserController : ControllerBase
 
         return Ok();
     }
+
+    [HttpGet("groupusers/{groupId:guid}")]
+    public async Task<ActionResult<Lazy<UserDTO>>> GetUsersByGroupId(Guid groupId)
+    {
+        var users = await _userRepository.GetUsersByGroupIdAsync(groupId);
+
+        return Ok(users);
+    }
 }
