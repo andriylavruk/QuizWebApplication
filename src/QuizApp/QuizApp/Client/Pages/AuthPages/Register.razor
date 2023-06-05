@@ -1,0 +1,71 @@
+﻿@page "/register"
+
+@inherits RegisterBase
+
+@if (_signInSuccessful == false)
+{
+    @if (_registerSuccessful == false)
+    {
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                    <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                        <div class="card-body p-5">
+
+                            <h2 class="text-center">Реєстрація</h2>
+                            <br />
+
+                            <EditForm Model="_userToRegister" OnValidSubmit="RegisterUser">
+                                <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                                <div class="form-group mb-4">
+                                    <label class="label-name" for="email">Електронна адреса:</label>
+                                    <InputText @bind-Value="_userToRegister.Email" id="email" class="form-control form-control-lg" />
+                                    <ValidationMessage For="@(() => _userToRegister.Email)" />
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="label-name" for="password">Пароль:</label>
+                                    <InputText @bind-Value="_userToRegister.Password" type="password" id="password" class="form-control form-control-lg" />
+                                    <ValidationMessage For="@(() => _userToRegister.Password)" />
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="label-name" for="password">Ім'я:</label>
+                                    <InputText @bind-Value="_userToRegister.FirstName" id="firstname" class="form-control form-control-lg" />
+                                    <ValidationMessage For="@(() => _userToRegister.FirstName)" />
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="label-name" for="password">Прізвище:</label>
+                                    <InputText @bind-Value="_userToRegister.LastName" id="lastname" class="form-control form-control-lg" />
+                                    <ValidationMessage For="@(() => _userToRegister.LastName)" />
+                                </div>
+
+                                <div class="d-flex justify-content-center">
+                                    <button type="submit" class="btn btn-primary btnSubmit buttonText btn-lg">Реєстрація</button>
+                                </div>
+
+                                @if (_attemptToRegisterFailed == true)
+                                {
+                                    <p class="text-danger">@_attemptToRegisterFailedErrorMessage</p>
+                                }
+
+                            </EditForm>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    else
+    {
+        NavigationManager.NavigateTo("/signin", true);
+    }
+}
+else
+{
+    NavigationManager.NavigateTo("/");
+}
