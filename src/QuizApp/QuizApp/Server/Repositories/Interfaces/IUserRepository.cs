@@ -5,6 +5,7 @@ namespace QuizApp.Server.Repositories.Interfaces;
 public interface IUserRepository
 {
     Task<List<User>> GetAllUsersAsync();
+    Task<List<User>> GetUsersWithoutGroupAsync();
     Task<User?> GetUserByIdAsync(Guid id);
     Task<List<User>> GetUsersByGroupIdAsync(Guid groupId);
     Task<User?> GetUserByEmailAsync(string email);

@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<User>>> GetAllUsers()
+    public async Task<ActionResult<List<UserDTO>>> GetAllUsers()
     {
         var users = await _userRepository.GetAllUsersAsync();
         var result = _mapper.Map<List<UserDTO>>(users);
@@ -32,8 +32,17 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("/userswithoutgroup")]
+    public async Task<ActionResult<List<UserDTO>>> GetUsersWithoutGroup()
+    {
+        var users = await _userRepository.GetUsersWithoutGroupAsync();
+        var result = _mapper.Map<List<UserDTO>>(users);
+
+        return Ok(result);
+    }
+
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<User>> GetUserById(Guid id)
+    public async Task<ActionResult<UserDTO>> GetUserById(Guid id)
     {
         var user = await _userRepository.GetUserByIdAsync(id);
         var mappedUser = _mapper.Map<UserDTO>(user);
@@ -84,7 +93,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("groupusers/{groupId:guid}")]
-    public async Task<ActionResult<Lazy<UserDTO>>> GetUsersByGroupId(Guid groupId)
+    public async Task<ActionResult<List<UserDTO>>> GetUsersByGroupId(Guid groupId)
     {
         var users = await _userRepository.GetUsersByGroupIdAsync(groupId);
 

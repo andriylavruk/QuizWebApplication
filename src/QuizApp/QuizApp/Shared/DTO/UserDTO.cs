@@ -16,5 +16,7 @@ public class UserDTO
     [Required]
     [StringLength(30, MinimumLength = 3)]
     public string LastName { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Обов'язкове поле.")]
+    public Guid? GroupId { get; set; }
     public Group? Group { get; set; }
 }

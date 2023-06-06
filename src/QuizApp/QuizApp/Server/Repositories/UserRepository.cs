@@ -25,6 +25,15 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
+    public async Task<List<User>> GetUsersWithoutGroupAsync()
+    {
+        return await _context.Users
+            .Include(x => x.Role)
+            .Include(x => x.Group)
+            .Where(x => x.GroupId == null && x.Role!.Name == "Student")
+            .ToListAsync();
+    }
+
     public async Task<User?> GetUserByIdAsync(Guid id)
     {
         return await _context.Users
