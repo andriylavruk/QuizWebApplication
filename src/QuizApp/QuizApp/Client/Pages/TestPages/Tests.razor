@@ -19,7 +19,7 @@
                     {
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
                             <h3>Тести</h3>
-                            <button class="btn btn-success btn-lg" @onclick="CreateEditTest">Створити тест</button>
+                            <button class="btn btn-success btn-lg" @onclick="CreateTest">Створити тест</button>
                         </div>
 
                         @if (testService.Tests == null)
@@ -48,10 +48,11 @@
                                         {
                                             <tr class="text-nowrap align-middle">
                                                 <td width="4%">@counter</td>
-                                                <td width="87%" class="text-truncate" style="max-width: 100px;">@test.Name</td>
-                                                <td width="9%">
+                                                <td width="81%" class="text-truncate" style="max-width: 100px;">@test.Name</td>
+                                                <td width="15%">
+                                                    <button class="btn alert-success" @onclick="(() => ShowTestQuestions(test.Id))"><i class="oi oi-book"></i></button>
                                                     <button class="btn alert-primary" @onclick="(() => ShowTestGroups(test.Id))"><i class="oi oi-people"></i></button>
-                                                    <button class="btn alert-warning" @onclick="(() => ShowTest(test.Id))"><i class="oi oi-pencil"></i></button>
+                                                    <button class="btn alert-warning" @onclick="(() => EditTest(test.Id))"><i class="oi oi-pencil"></i></button>
                                                     <button class="btn alert-danger" @onclick="(() => DeleteTest(test.Id))"><i class="oi oi-trash"></i></button>
                                                 </td>
                                             </tr>

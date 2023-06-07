@@ -41,7 +41,7 @@ public class GroupsBase : ComponentBase
         }
     }
 
-    protected void ShowGroup(Guid id)
+    protected void EditGroup(Guid id)
     {
         NavigationManager.NavigateTo($"group/{id}");
     }
@@ -51,7 +51,7 @@ public class GroupsBase : ComponentBase
         NavigationManager.NavigateTo($"/groupusers/{groupId}");
     }
 
-    protected void CreateEditGroup()
+    protected void CreateGroup()
     {
         NavigationManager.NavigateTo("/group");
     }

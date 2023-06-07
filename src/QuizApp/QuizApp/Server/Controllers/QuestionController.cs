@@ -34,6 +34,16 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet]
+    [Route("/questionsForTest/{testId:guid}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<List<Question>>> GetQuestionsByTestTestId(Guid testId)
+    {
+        var questions = await _questionRepository.GetQuestionsByTestIdAsync(testId);
+
+        return Ok(questions);
+    }
+
+    [HttpGet]
     [Route("/questionsForTestParticipant/{testId:guid}")]
     [Authorize(Roles = "Student")]
     public async Task<ActionResult<List<Question>>> GetQuestionsForTestParticipantByTestId(Guid testId)

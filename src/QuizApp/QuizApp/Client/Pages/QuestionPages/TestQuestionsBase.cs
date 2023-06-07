@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
 
-namespace QuizApp.Client.Pages.TestPages;
+namespace QuizApp.Client.Pages.QuestionPages;
 
-public class TestsBase : ComponentBase
+public class TestQuestionsBase : ComponentBase
 {
-    [Inject]
-    public IGroupService groupService { get; set; }
+    [Parameter]
+    public Guid Id { get; set; }
 
     [Inject]
-    public ITestService testService { get; set; }
+    public IQuestionService questionService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -31,7 +31,7 @@ public class TestsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await testService.GetAllTests();
+                await questionService.GetQuestionsByTestId(Id);
             }
             else
             {
@@ -44,30 +44,20 @@ public class TestsBase : ComponentBase
         }
     }
 
-    protected void ShowTestQuestions(Guid id)
+    protected void EditQuestion(Guid id)
     {
-        NavigationManager.NavigateTo($"/testquestions/{id}");
+        NavigationManager.NavigateTo($"question/{Id}/{id}");
     }
 
-    protected void EditTest(Guid id)
+    protected void CreateQuestion()
     {
-        NavigationManager.NavigateTo($"test/{id}");
+        NavigationManager.NavigateTo($"/question/{Id}");
     }
 
-    protected void ShowTestGroups(Guid testId)
+    protected async Task DeleteQuestion(Guid id)
     {
-        NavigationManager.NavigateTo($"/testgroups/{testId}");
-    }
-
-    protected void CreateTest()
-    {
-        NavigationManager.NavigateTo("/test");
-    }
-
-    protected async Task DeleteTest(Guid id)
-    {
-        await testService.DeleteTest(id);
-        await testService.GetAllTests();
-        NavigationManager.NavigateTo("/tests");
+        await questionService.DeleteQuestion(id);
+        await questionService.GetQuestionsByTestId(Id);
+        NavigationManager.NavigateTo("/questions");
     }
 }

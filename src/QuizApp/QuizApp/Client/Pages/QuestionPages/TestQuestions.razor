@@ -1,10 +1,11 @@
-﻿@page "/groups"
+﻿@page "/testquestions/{id:guid}"
+
 @using Microsoft.AspNetCore.Authorization;
 
 @attribute [Authorize(Roles = "Administrator")]
-@inherits GroupsBase
+@inherits TestQuestionsBase
 
-<PageTitle>Групи</PageTitle>
+<PageTitle>Питаання тесту</PageTitle>
 
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -18,17 +19,17 @@
                     else
                     {
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
-                            <h3>Групи</h3>
-                            <button class="btn btn-success btn-lg" @onclick="CreateGroup">Створити групу</button>
+                            <h3>Питання</h3>
+                            <button class="btn btn-success btn-lg" @onclick="CreateQuestion">Додати питання</button>
                         </div>
 
-                        @if (groupService.Groups == null)
+                        @if (questionService.Questions == null)
                         {
                             <p><em>Завантаження...</em></p>
                         }
-                        else if (groupService.Groups.Count == 0)
+                        else if (questionService.Questions.Count == 0)
                         {
-                            <p>Немає груп.</p>
+                            <p>Немає питань у тесті.</p>
                         }
                         else
                         {
@@ -44,15 +45,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var group in groupService.Groups)
+                                        @foreach (var question in questionService.Questions)
                                         {
                                             <tr class="text-nowrap align-middle">
                                                 <td width="4%">@counter</td>
-                                                <td width="87%" class="text-truncate" style="max-width: 100px;">@group.Name</td>
+                                                <td width="87%" class="text-truncate" style="max-width: 100px;">@question.Description</td>
                                                 <td width="9%">
-                                                    <button class="btn alert-primary" @onclick="(() => ShowGroupUsers(group.Id))"><i class="oi oi-person"></i></button>
-                                                    <button class="btn alert-warning" @onclick="(() => EditGroup(group.Id))"><i class="oi oi-pencil"></i></button>
-                                                    <button class="btn alert-danger" @onclick="(() => DeleteGroup(group.Id))"><i class="oi oi-trash"></i></button>
+                                                    <button class="btn alert-warning" @onclick="(() => EditQuestion(question.Id))"><i class="oi oi-pencil"></i></button>
+                                                    <button class="btn alert-danger" @onclick="(() => DeleteQuestion(question.Id))"><i class="oi oi-trash"></i></button>
                                                 </td>
                                             </tr>
 
