@@ -28,6 +28,15 @@ public class GroupController : ControllerBase
     }
 
     [HttpGet]
+    [Route("/testgroups/{testId:guid}")]
+    public async Task<ActionResult<List<Group>>> GetGroupsByTestId(Guid testId)
+    {
+        var groups = await _groupRepository.GetGroupsByTestIdAsync(testId);
+
+        return Ok(groups);
+    }
+
+    [HttpGet]
     [Route("{id:guid}")]
     public async Task<IActionResult> GetGroupById(Guid id)
     {
@@ -39,6 +48,15 @@ public class GroupController : ControllerBase
         }
 
         return Ok(group);
+    }
+
+    [HttpGet]
+    [Route("/groupstoaddtotest/{testId:guid}")]
+    public async Task<ActionResult<List<Group>>> GetGroupsToAddByTestId(Guid testId)
+    {
+        var groups = await _groupRepository.GetGroupsToAddByTestIdAsync(testId);
+
+        return Ok(groups);
     }
 
     [HttpPost]

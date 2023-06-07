@@ -2,15 +2,18 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
 
-namespace QuizApp.Client.Pages.TestPages;
+namespace QuizApp.Client.Pages.GroupPages;
 
-public class TestsBase : ComponentBase
+public class TestGroupsBase : ComponentBase
 {
+    [Parameter]
+    public Guid Id { get; set; }
+
     [Inject]
     public IGroupService groupService { get; set; }
 
     [Inject]
-    public ITestService testService { get; set; }
+    public ITestParticipantService testParticipantService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -31,7 +34,7 @@ public class TestsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await testService.GetAllTests();
+                await groupService.GetGroupsByTestId(Id);
             }
             else
             {
@@ -44,25 +47,20 @@ public class TestsBase : ComponentBase
         }
     }
 
-    protected void ShowTest(Guid id)
+    protected void AddGroupToTest()
     {
-        NavigationManager.NavigateTo($"test/{id}");
+        NavigationManager.NavigateTo($"/testgroup/{Id}");
     }
 
-    protected void ShowTestGroups(Guid testId)
+    protected void ShowGroupUsers(Guid groupId)
     {
-        NavigationManager.NavigateTo($"/testgroups/{testId}");
+        NavigationManager.NavigateTo($"/groupusers/{groupId}");
     }
 
-    protected void CreateEditTest()
+    protected async Task DeleteGroupFromTest(Guid groupId)
     {
-        NavigationManager.NavigateTo("/test");
-    }
-
-    protected async Task DeleteTest(Guid id)
-    {
-        await testService.DeleteTest(id);
-        await testService.GetAllTests();
-        NavigationManager.NavigateTo("/tests");
+        await testParticipantService.DeleteTestParticipantsByGroupId(Id, groupId);
+        await groupService.GetGroupsByTestId(Id);
+        NavigationManager.NavigateTo($"/testgroups/{Id}");
     }
 }

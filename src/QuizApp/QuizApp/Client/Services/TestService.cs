@@ -77,10 +77,4 @@ public class TestService : ITestService
 
         return Tests;
     }
-
-    /*Task<Test> GetTestById();
-    Task<Test> GetTestByIdForUser(Guid id);
-
-    Task<List<QuestionForTestParticipantDTO>> StartTest(Guid testId);
-    Task<List<TestResultDTO>> FinishTest(Guid testId, AnswersToQuestionsDTO answersToQuestionsDTO);*/
 }

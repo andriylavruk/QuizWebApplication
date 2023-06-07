@@ -1,19 +1,34 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.DTO;
+using QuizApp.Shared.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuizApp.Client.Pages.TestPages;
 
-public class TestsBase : ComponentBase
+public class AddGroupToTestBase : ComponentBase
 {
+    [Parameter]
+    public Guid Id { get; set; }
+
     [Inject]
     public IGroupService groupService { get; set; }
+
+    [Inject]
+    public ITestParticipantService testParticipantService { get; set; }
 
     [Inject]
     public ITestService testService { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    public Test test = new Test();
+
+    public List<Group> groups = new List<Group>();
+
+    public AddGroupToTestDTO group = new AddGroupToTestDTO();
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
@@ -31,7 +46,7 @@ public class TestsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await testService.GetAllTests();
+                groups = await groupService.GetGroupsToAddByTestId(Id);
             }
             else
             {
@@ -44,25 +59,17 @@ public class TestsBase : ComponentBase
         }
     }
 
-    protected void ShowTest(Guid id)
+    protected override async Task OnParametersSetAsync()
     {
-        NavigationManager.NavigateTo($"test/{id}");
+        if (Id != Guid.Empty)
+        {
+            test = await testService.GetTestById(Id);
+        }
     }
 
-    protected void ShowTestGroups(Guid testId)
+    protected async Task AddGroupToTest()
     {
-        NavigationManager.NavigateTo($"/testgroups/{testId}");
-    }
-
-    protected void CreateEditTest()
-    {
-        NavigationManager.NavigateTo("/test");
-    }
-
-    protected async Task DeleteTest(Guid id)
-    {
-        await testService.DeleteTest(id);
-        await testService.GetAllTests();
-        NavigationManager.NavigateTo("/tests");
+        await testParticipantService.AddTestParticipantsByGroupId(Id, new Guid(group.Id.ToString()!));
+        NavigationManager.NavigateTo($"/testgroups/{Id}");
     }
 }

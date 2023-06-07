@@ -60,7 +60,7 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpPost("addtestparticipants/{testId:guid}/{groupId:guid}")]
-    public async Task<IActionResult> AddTestParticipantsByGroup(Guid testId, Guid groupId)
+    public async Task<IActionResult> AddTestParticipantsByGroupId(Guid testId, Guid groupId)
     {
         var test = await _testRepository.GetTestByIdAsync(testId);
         var group = await _groupRepository.GetGroupByIdAsync(groupId);
@@ -71,6 +71,22 @@ public class TestParticipantController : ControllerBase
         }
 
         await _testParticipantRepository.AddTestParticipantsByGroupIdAsync(testId, groupId);
+
+        return Ok();
+    }
+
+    [HttpPost("deletetestparticipants/{testId:guid}/{groupId:guid}")]
+    public async Task<IActionResult> DeleteTestParticipantsByGroupI(Guid testId, Guid groupId)
+    {
+        var test = await _testRepository.GetTestByIdAsync(testId);
+        var group = await _groupRepository.GetGroupByIdAsync(groupId);
+
+        if (test == null || group == null)
+        {
+            return BadRequest();
+        }
+
+        await _testParticipantRepository.DeleteTestParticipantsByGroupIdAsync(testId, groupId);
 
         return Ok();
     }

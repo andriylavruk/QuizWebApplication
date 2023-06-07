@@ -2,6 +2,8 @@
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace QuizApp.Server.Repositories;
 
@@ -19,6 +21,25 @@ public class GroupRepository : IGroupRepository
         return await _context.Groups.ToListAsync();
     }
 
+    public async Task<List<Group>> GetGroupsByTestIdAsync(Guid testId)
+    {
+        var participants = _context.TestParticipants
+            .Include(x => x.User)
+            .Where(x => x.TestId == testId);
+
+        var groups =
+            from grp in _context.Groups
+            join partc in participants on grp.Id equals partc.User!.GroupId
+            group grp by grp.Id into g
+            select new Group
+            {
+                Id = g.Key,
+                Name = g.FirstOrDefault()!.Name
+            };
+
+        return await groups.ToListAsync();
+    }
+
     public async Task<Group?> GetGroupByIdAsync(Guid id)
     {
         return await _context.Groups.FirstOrDefaultAsync(r => r.Id == id);
@@ -27,6 +48,26 @@ public class GroupRepository : IGroupRepository
     public async Task<Group?> GetGroupByNameAsync(string groupName)
     {
         return await _context.Groups.FirstOrDefaultAsync(r => r.Name == groupName);
+    }
+
+    public async Task<List<Group>> GetGroupsToAddByTestIdAsync(Guid testId)
+    {
+        var groups =
+            from grp in _context.Groups
+            join users in _context.Users on grp.Id equals users.GroupId
+            group grp by grp.Id into g
+            select new Group
+            {
+                Id = g.Key,
+                Name = g.FirstOrDefault()!.Name
+            };
+
+        var groupList = await groups.ToListAsync();
+        var groupsInTest = await GetGroupsByTestIdAsync(testId);
+
+        groupList.RemoveAll(x => groupsInTest.Any(y => y.Id == x.Id));
+
+        return groupList;
     }
 
     public async Task<bool> IsGroupExistAsync(Guid id)

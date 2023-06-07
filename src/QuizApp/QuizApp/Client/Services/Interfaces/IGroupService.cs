@@ -8,6 +8,8 @@ public interface IGroupService
 
     Task<List<Group>> GetAllGroups();
     Task<Group> GetGroupById(Guid id);
+    Task<List<Group>> GetGroupsByTestId(Guid testId);
+    Task<List<Group>> GetGroupsToAddByTestId(Guid testId);
     Task CreateGroup(Group group);
     Task UpdateGroup(Group group);
     Task DeleteGroup(Guid id);

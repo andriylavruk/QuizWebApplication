@@ -12,11 +12,4 @@ public interface ITestService
     Task CreateTest(Test test);
     Task UpdateTest(Test test);
     Task DeleteTest(Guid id);
-
-    /*Task<List<Test>> GetTestsForUser();
-    Task<Test> GetTestById();
-    Task<Test> GetTestByIdForUser(Guid id);
-
-    Task<List<QuestionForTestParticipantDTO>> StartTest(Guid testId);
-    Task<List<TestResultDTO>> FinishTest(Guid testId, AnswersToQuestionsDTO answersToQuestionsDTO);*/
 }

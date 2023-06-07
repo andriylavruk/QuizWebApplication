@@ -46,6 +46,40 @@ public class GroupService : IGroupService
         }
     }
 
+    public async Task<List<Group>> GetGroupsByTestId(Guid testId)
+    {
+        var httpResponse = await _httpClient.GetAsync($"/testgroups/{testId}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var result = await httpResponse.Content.ReadFromJsonAsync<List<Group>>();
+
+            if (result != null)
+            {
+                Groups = result;
+            }
+        }
+
+        return Groups;
+    }
+
+    public async Task<List<Group>> GetGroupsToAddByTestId(Guid testId)
+    {
+        var httpResponse = await _httpClient.GetAsync($"/groupstoaddtotest/{testId}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var result = await httpResponse.Content.ReadFromJsonAsync<List<Group>>();
+
+            if (result != null)
+            {
+                Groups = result;
+            }
+        }
+
+        return Groups;
+    }
+
     public async Task CreateGroup(Group group)
     {
         var result = await _httpClient.PostAsJsonAsync("api/group", group);

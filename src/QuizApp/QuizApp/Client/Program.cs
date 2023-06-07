@@ -18,6 +18,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<ITestParticipantService, TestParticipantService>();
 
 builder.Services.AddScoped<AuthenticationStateProvider, AppAuthenticationStateProvider>();
 builder.Services.AddBlazoredLocalStorage();
