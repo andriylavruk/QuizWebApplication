@@ -1,5 +1,8 @@
-﻿using QuizApp.Client.Services.Interfaces;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using QuizApp.Client.Services.Interfaces;
 using QuizApp.Shared.Models;
+using System.Data;
 using System.Net.Http.Json;
 
 namespace QuizApp.Client.Services;
@@ -32,9 +35,40 @@ public class TestService : ITestService
         return Tests;
     }
 
+    public async Task<List<Test>> GetTestsForCurrentUser()
+    {
+        var httpResponse = await _httpClient.GetAsync($"/testsforuser");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var result = await httpResponse.Content.ReadFromJsonAsync<List<Test>>();
+
+            if (result != null)
+            {
+                Tests = result;
+            }
+        }
+
+        return Tests;
+    }
+
     public async Task<Test> GetTestById(Guid id)
     {
         var result = await _httpClient.GetFromJsonAsync<Test>($"api/test/{id}");
+
+        if (result != null)
+        {
+            return result;
+        }
+        else
+        {
+            throw new Exception("Test not found.");
+        }
+    }
+
+    public async Task<Test> GetTestByIdForUser(Guid id)
+    {
+        var result = await _httpClient.GetFromJsonAsync<Test>($"/testForUser/{id}");
 
         if (result != null)
         {

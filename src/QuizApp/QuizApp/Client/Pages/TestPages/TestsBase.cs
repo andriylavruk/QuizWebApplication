@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using QuizApp.Client.Pages.QuestionPages;
+using QuizApp.Client.Services;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.TestPages;
 
@@ -31,7 +34,15 @@ public class TestsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await testService.GetAllTests();
+
+                if (user.IsInRole("Administrator"))
+                {
+                    await testService.GetAllTests();
+                }
+                else if (user.IsInRole("Student"))
+                {
+                    await testService.GetTestsForCurrentUser();
+                }
             }
             else
             {
@@ -62,6 +73,11 @@ public class TestsBase : ComponentBase
     protected void CreateTest()
     {
         NavigationManager.NavigateTo("/test");
+    }
+
+    protected void ShowTestInfo(Guid testId)
+    {
+        NavigationManager.NavigateTo($"/testinfo/{testId}");
     }
 
     protected async Task DeleteTest(Guid id)

@@ -1,0 +1,37 @@
+﻿@page "/testinfo/{id:guid}"
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Student")]
+@inherits TestInfoPageBase
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        <PageTitle>Тест @test.Name</PageTitle>
+                        <h3>Тест @test.Name</h3>
+
+                        <br />
+
+                        <div class="form-group mb-4">
+                            <label for="testName">Назва</label>
+                            <InputText id="testName" @bind-Value="test.Name" disabled class="form-control form-control-lg"></InputText>
+                        </div>
+                        <br />
+
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-danger btn-lg m-1" @onclick="StartTest">Видалити тест</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

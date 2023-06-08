@@ -5,7 +5,7 @@ using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.TestPages;
 
-public class TestPageBase : ComponentBase
+public class TestInfoPageBase : ComponentBase
 {
     [Parameter]
     public Guid Id { get; set; }
@@ -15,8 +15,6 @@ public class TestPageBase : ComponentBase
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
-
-    public string btnText = string.Empty;
 
     public Test test = new Test();
 
@@ -30,8 +28,6 @@ public class TestPageBase : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         var user = (await AuthenticationState).User;
-
-        btnText = Id == Guid.Empty ? "Створити тест" : "Редагувати тест";
 
         try
         {
@@ -54,27 +50,12 @@ public class TestPageBase : ComponentBase
     {
         if (Id != Guid.Empty)
         {
-            test = await testService.GetTestById(Id);
+            test = await testService.GetTestByIdForUser(Id);
         }
     }
 
-    protected async Task HandleSubmit()
+    protected async Task StartTest()
     {
-        if (Id == Guid.Empty)
-        {
-            await testService.CreateTest(test);
-        }
-        else
-        {
-            await testService.UpdateTest(test);
-        }
-
-        NavigationManager.NavigateTo("/tests");
-    }
-
-    protected async Task DeleteTest()
-    {
-        await testService.DeleteTest(test.Id);
         NavigationManager.NavigateTo("/tests");
     }
 }
