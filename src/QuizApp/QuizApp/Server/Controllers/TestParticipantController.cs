@@ -59,6 +59,15 @@ public class TestParticipantController : ControllerBase
         return Ok(testParticipant);
     }
 
+    [HttpGet]
+    [Route("participants/{testId:guid}/{groupId:guid}")]
+    public async Task<ActionResult<List<TestParticipant>>> GetTestParticipantByTestIdByGroupIdAsync(Guid testId, Guid groupId)
+    {
+        var testParticipants = await _testParticipantRepository.GetTestParticipantByTestIdByGroupIdAsync(testId, groupId);
+
+        return Ok(testParticipants);
+    }
+
     [HttpPost("addtestparticipants/{testId:guid}/{groupId:guid}")]
     public async Task<IActionResult> AddTestParticipantsByGroupId(Guid testId, Guid groupId)
     {

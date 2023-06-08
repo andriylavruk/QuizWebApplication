@@ -86,10 +86,8 @@ public class AuthController : ControllerBase
         List<Claim> claims = new List<Claim>
         {
             new Claim (ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim (ClaimTypes.Email, user.Email),
             new Claim (ClaimTypes.Role, user.Role!.Name),
-            new Claim (ClaimTypes.Name, user.FirstName),
-            new Claim (ClaimTypes.Surname, user.LastName)
+            new Claim (ClaimTypes.Name, user.Email)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:SecretKey").Value!));

@@ -1,22 +1,30 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.Models;
 
-namespace QuizApp.Client.Pages.GroupPages;
+namespace QuizApp.Client.Pages.ResultsTestPages;
 
-public class TestGroupsBase : ComponentBase
+public class TestResultsBase : ComponentBase
 {
     [Parameter]
-    public Guid Id { get; set; }
+    public Guid testId { get; set; }
 
-    [Inject]
-    public IGroupService groupService { get; set; }
+    [Parameter]
+    public Guid groupId { get; set; }
 
     [Inject]
     public ITestParticipantService testParticipantService { get; set; }
 
     [Inject]
+    public IQuestionService questionService { get; set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    private List<Question> testQuestions { get; set; }
+
+    public int numberOfQuestions { get; set; }
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
@@ -34,7 +42,9 @@ public class TestGroupsBase : ComponentBase
             if (user.Identity.IsAuthenticated == true)
             {
                 _signInSuccessful = true;
-                await groupService.GetGroupsByTestId(Id);
+                await testParticipantService.GetTestParticipantsByTestIdByGroupId(testId, groupId);
+                testQuestions = await questionService.GetQuestionsByTestId(testId);
+                numberOfQuestions = testQuestions.Count;
             }
             else
             {
@@ -45,27 +55,5 @@ public class TestGroupsBase : ComponentBase
         {
             ErrorMessage = ex.Message;
         }
-    }
-
-    protected void AddGroupToTest()
-    {
-        NavigationManager.NavigateTo($"/testgroup/{Id}");
-    }
-
-    protected void ShowGroupUsers(Guid groupId)
-    {
-        NavigationManager.NavigateTo($"/groupusers/{groupId}");
-    }
-
-    protected void ShowTestResults(Guid groupId)
-    {
-        NavigationManager.NavigateTo($"/testgroups/{Id}/{groupId}");
-    }
-
-    protected async Task DeleteGroupFromTest(Guid groupId)
-    {
-        await testParticipantService.DeleteTestParticipantsByGroupId(Id, groupId);
-        await groupService.GetGroupsByTestId(Id);
-        NavigationManager.NavigateTo($"/testgroups/{Id}");
     }
 }

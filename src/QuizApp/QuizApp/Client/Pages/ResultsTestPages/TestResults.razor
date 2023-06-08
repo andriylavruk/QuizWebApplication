@@ -1,10 +1,11 @@
-﻿@page "/testgroups/{id:guid}"
+﻿@page "/testgroups/{testId:guid}/{groupId:guid}"
+
 @using Microsoft.AspNetCore.Authorization;
 
 @attribute [Authorize(Roles = "Administrator")]
-@inherits TestGroupsBase
+@inherits TestResultsBase
 
-<PageTitle>Групи тесту</PageTitle>
+<PageTitle>Результати тесту</PageTitle>
 
 <div class="container py-5 h-100">
     <div class="row d-flex justify-content-center align-items-center h-100">
@@ -18,17 +19,16 @@
                     else
                     {
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
-                            <h3>Групи тесту</h3>
-                            <button class="btn btn-success btn-lg" @onclick="AddGroupToTest">Додати групу</button>
+                            <h3>Результати</h3>
                         </div>
 
-                        @if (groupService.Groups == null)
+                        @if (testParticipantService.TestParticipants == null)
                         {
                             <p><em>Завантаження...</em></p>
                         }
-                        else if (groupService.Groups.Count == 0)
+                        else if (testParticipantService.TestParticipants.Count == 0)
                         {
-                            <p>Немає груп у тесті.</p>
+                            <p>Немає результатів тесту.</p>
                         }
                         else
                         {
@@ -39,21 +39,30 @@
                                     <thead>
                                         <tr>
                                             <th>№</th>
-                                            <th>Назва</th>
-                                            <th>Опції</th>
+                                            <th>Прізвище</th>
+                                            <th>Ім'я</th>
+                                            <th>Дата закінчення</th>
+                                            <th>Оцінка</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var group in groupService.Groups)
+                                        @foreach (var testParticipant in testParticipantService.TestParticipants)
                                         {
                                             <tr class="text-nowrap align-middle">
                                                 <td width="4%">@counter</td>
-                                                <td width="87%" class="text-truncate" style="max-width: 100px;">@group.Name</td>
-                                                <td width="9%">
-                                                    <button class="btn alert-primary" @onclick="(() => ShowGroupUsers(group.Id))"><i class="oi oi-person"></i></button>
-                                                    <button class="btn alert-info" @onclick="(() => ShowTestResults(group.Id))"><i class="oi oi-document"></i></button>
-                                                    <button class="btn alert-danger" @onclick="(() => DeleteGroupFromTest(group.Id))"><i class="oi oi-trash"></i></button>
-                                                </td>
+                                                <td width="30%" class="text-truncate" style="max-width: 100px;">@testParticipant.User?.LastName</td>
+                                                <td width="30%" class="text-truncate" style="max-width: 100px;">@testParticipant.User?.FirstName</td>
+                                                <td width="25%">@testParticipant.FinishedAt?.ToString("MM/dd/yyyy HH:mm:ss")</td>
+                                                @if (testParticipant.Grade == null)
+                                                {
+                                                    <td width="11%" class="text-truncate" style="max-width: 100px;"></td>
+                                                }
+                                                else
+                                                {
+                                                    <td width="11%">@testParticipant.Grade/@numberOfQuestions</td>
+                                                }
+
                                             </tr>
 
                                             counter++;
