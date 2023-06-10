@@ -39,7 +39,7 @@ public class RegisterBase : ComponentBase
         {
             string serverErrorMessages = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            _attemptToRegisterFailedErrorMessage = $"{serverErrorMessages} Try input again.";
+            _attemptToRegisterFailedErrorMessage = $"{serverErrorMessages} Спробуйте ще раз.";
 
             _attemptToRegisterFailed = true;
         }
