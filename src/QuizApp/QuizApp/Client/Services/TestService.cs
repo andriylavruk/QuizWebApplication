@@ -14,7 +14,7 @@ public class TestService : ITestService
         _httpClient = httpClient;
     }
 
-    public List<Test> Tests { get; set; } = new List<Test>();
+    public List<Test>? Tests { get; set; }
 
     public async Task<List<Test>> GetAllTests()
     {

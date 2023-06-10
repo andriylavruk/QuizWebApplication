@@ -13,7 +13,7 @@ public class QuestionService : IQuestionService
         _httpClient = httpClient;
     }
 
-    public List<Question> Questions { get; set; } = new List<Question>();
+    public List<Question>? Questions { get; set; }
 
     public async Task<List<Question>> GetQuestionsByTestId(Guid testId)
     {

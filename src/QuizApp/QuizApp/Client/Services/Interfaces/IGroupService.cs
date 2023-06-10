@@ -4,7 +4,7 @@ namespace QuizApp.Client.Services.Interfaces;
 
 public interface IGroupService
 {
-    List<Group> Groups { get; set; }
+    List<Group>? Groups { get; set; }
 
     Task<List<Group>> GetAllGroups();
     Task<Group> GetGroupById(Guid id);

@@ -16,7 +16,9 @@ public class TestRepository : ITestRepository
 
     public async Task<List<Test>> GetAllTestsAsync()
     {
-        return await _context.Tests.ToListAsync();
+        return await _context.Tests
+            .OrderBy(x => x.Name)
+            .ToListAsync();
     }
 
     public async Task<List<Test>> GetTestsForUserAsync(Guid userId)
@@ -35,7 +37,9 @@ public class TestRepository : ITestRepository
             where tpar.UserId == user!.Id
             select test;
 
-        return await tests.ToListAsync();
+        return await tests
+            .OrderBy(x => x.Name)
+            .ToListAsync();
     }
 
     public async Task<Test?> GetTestByIdAsync(Guid id)

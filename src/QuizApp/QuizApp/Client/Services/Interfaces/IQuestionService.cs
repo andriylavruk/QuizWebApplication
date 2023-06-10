@@ -4,7 +4,7 @@ namespace QuizApp.Client.Services.Interfaces;
 
 public interface IQuestionService
 {
-    List<Question> Questions { get; set; }
+    List<Question>? Questions { get; set; }
 
     Task<List<Question>> GetQuestionsByTestId(Guid testId);
     Task<Question> GetQuestionById(Guid id);

@@ -13,7 +13,7 @@ public class GroupService : IGroupService
         _httpClient = httpClient;
     }
 
-    public List<Group> Groups { get; set; } = new List<Group>();
+    public List<Group>? Groups { get; set; }
 
     public async Task<List<Group>> GetAllGroups()
     {

@@ -14,7 +14,7 @@ public class TestParticipantService : ITestParticipantService
         _httpClient = httpClient;
     }
 
-    public List<TestParticipant> TestParticipants { get; set; } = new List<TestParticipant>();
+    public List<TestParticipant>? TestParticipants { get; set; }
 
     public async Task<List<TestParticipant>> GetTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId)
     {

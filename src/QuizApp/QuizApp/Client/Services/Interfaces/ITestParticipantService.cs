@@ -5,7 +5,7 @@ namespace QuizApp.Client.Services.Interfaces;
 
 public interface ITestParticipantService
 {
-    List<TestParticipant> TestParticipants { get; set; }
+    List<TestParticipant>? TestParticipants { get; set; }
 
     Task<List<TestParticipant>> GetTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId);
     Task<TestParticipantInformationDTO?> GetTestParticipantInfoByTestIdForUser(Guid testId);

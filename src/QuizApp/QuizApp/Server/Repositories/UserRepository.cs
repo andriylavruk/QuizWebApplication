@@ -22,6 +22,8 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .Include(x => x.Role)
             .Include(x => x.Group)
+            .OrderBy(x => x.LastName)
+            .ThenBy(x => x.FirstName)
             .ToListAsync();
     }
 
@@ -31,6 +33,8 @@ public class UserRepository : IUserRepository
             .Include(x => x.Role)
             .Include(x => x.Group)
             .Where(x => x.GroupId == null && x.Role!.Name == "Student")
+            .OrderBy(x => x.LastName)
+            .ThenBy(x => x.FirstName)
             .ToListAsync();
     }
 
@@ -46,6 +50,8 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Where(x => x.GroupId == groupId)
+            .OrderBy(x => x.LastName)
+            .ThenBy(x => x.FirstName)
             .ToListAsync();
     }
 

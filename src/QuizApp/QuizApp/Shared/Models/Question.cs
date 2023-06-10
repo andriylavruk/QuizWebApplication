@@ -31,6 +31,6 @@ public class Question
     public string Option4 { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Обов'язкове поле.")]
-    [Range(0, 4, ErrorMessage = "Число повинно бути у межах від 1 до 4.")]
-    public int RightAnswer { get; set; }
+    [Range(1, 4, ErrorMessage = "Число повинно бути у межах від 1 до 4.")]
+    public int RightAnswer { get; set; } = 1;
 }

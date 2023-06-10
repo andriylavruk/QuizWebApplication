@@ -13,7 +13,7 @@ public class UserService : IUserService
         _httpClient = httpClient;
     }
 
-    public List<UserDTO> Users { get; set; } = new List<UserDTO>();
+    public List<UserDTO>? Users { get; set; }
 
     public async Task<List<UserDTO>> GetUsersByGroupId(Guid groupId)
     {

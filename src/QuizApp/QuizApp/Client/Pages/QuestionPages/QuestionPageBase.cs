@@ -58,14 +58,11 @@ public class QuestionPageBase : ComponentBase
         if (questionId != Guid.Empty)
         {
             question = await questionService.GetQuestionById(questionId);
-            question.RightAnswer += 1;
         }
     }
 
     protected async Task HandleSubmit()
     {
-        question.RightAnswer -= 1;
-
         if (questionId == Guid.Empty)
         {
             question.TestId = testId;

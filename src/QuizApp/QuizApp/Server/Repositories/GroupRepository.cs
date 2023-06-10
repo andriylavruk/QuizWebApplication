@@ -18,7 +18,9 @@ public class GroupRepository : IGroupRepository
 
     public async Task<List<Group>> GetAllGroupsAsync()
     {
-        return await _context.Groups.ToListAsync();
+        return await _context.Groups
+            .OrderBy(x => x.Name)
+            .ToListAsync();
     }
 
     public async Task<List<Group>> GetGroupsByTestIdAsync(Guid testId)
@@ -37,7 +39,9 @@ public class GroupRepository : IGroupRepository
                 Name = g.FirstOrDefault()!.Name
             };
 
-        return await groups.ToListAsync();
+        return await groups
+            .OrderBy(x => x.Name)
+            .ToListAsync();
     }
 
     public async Task<Group?> GetGroupByIdAsync(Guid id)
@@ -62,7 +66,7 @@ public class GroupRepository : IGroupRepository
                 Name = g.FirstOrDefault()!.Name
             };
 
-        var groupList = await groups.ToListAsync();
+        var groupList = await groups.OrderBy(x => x.Name).ToListAsync();
         var groupsInTest = await GetGroupsByTestIdAsync(testId);
 
         groupList.RemoveAll(x => groupsInTest.Any(y => y.Id == x.Id));
