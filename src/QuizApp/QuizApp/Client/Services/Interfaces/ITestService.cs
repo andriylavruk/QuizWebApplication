@@ -1,4 +1,5 @@
-﻿using QuizApp.Shared.Models;
+﻿using QuizApp.Shared.DTO;
+using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Services.Interfaces;
 
@@ -13,4 +14,6 @@ public interface ITestService
     Task CreateTest(Test test);
     Task UpdateTest(Test test);
     Task DeleteTest(Guid id);
+    Task<List<QuestionForTestParticipantDTO>> StartTest(Guid testId);
+    Task<TestResultDTO> FinishTest(Guid testId, List<QuestionForTestParticipantDTO> questionForTestParticipantDTOs);
 }

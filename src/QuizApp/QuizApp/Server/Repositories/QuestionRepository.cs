@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NuGet.Packaging.Signing;
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.DTO;
@@ -76,21 +75,16 @@ public class QuestionRepository : IQuestionRepository
         return question != null;
     }
 
-    public async Task<int> CalculateGrade(AnswersToQuestionsDTO answersToQuestionsDTO)
+    public async Task<int> CalculateGrade(Guid testId, List<QuestionForTestParticipantDTO> questionForTestParticipantDTOs)
     {
-        var questions = await _context.Questions
-            .Where(x => x.TestId == answersToQuestionsDTO.TestId)
-            .ToListAsync();
+        var questions =
+            from qst in await _context.Questions.Where(x => x.TestId == testId).ToListAsync()
+            join ans in questionForTestParticipantDTOs on qst.Id equals ans.Id
+            where qst.RightAnswer == ans.RightAnswer
+            select qst;
 
-        var grade = 0;
-
-        foreach(var (x, y) in questions.Zip(answersToQuestionsDTO.Answers))
-        {
-            if(x.RightAnswer == y)
-            {
-                grade++;
-            }
-        }
+        var questionsResult = questions.ToList();
+        var grade = questionsResult.Count;
 
         return grade;
     }

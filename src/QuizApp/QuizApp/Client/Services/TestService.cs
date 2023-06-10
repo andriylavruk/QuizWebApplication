@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using QuizApp.Client.Services.Interfaces;
+﻿using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.DTO;
 using QuizApp.Shared.Models;
-using System.Data;
 using System.Net.Http.Json;
 
 namespace QuizApp.Client.Services;
@@ -110,5 +108,41 @@ public class TestService : ITestService
         }
 
         return Tests;
+    }
+
+    public async Task<List<QuestionForTestParticipantDTO>> StartTest(Guid testId)
+    {
+        var httpResponse = await _httpClient.GetAsync($"/starttest/{testId}");
+
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var result = await httpResponse.Content.ReadFromJsonAsync<List<QuestionForTestParticipantDTO>>();
+
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return new List<QuestionForTestParticipantDTO>();
+    }
+
+    public async Task<TestResultDTO> FinishTest(Guid testId, List<QuestionForTestParticipantDTO> questionForTestParticipantDTOs)
+    {
+        var httpResponse = await _httpClient.PostAsJsonAsync($"/finishtest/{testId}", questionForTestParticipantDTOs);
+
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            var result = await httpResponse.Content.ReadFromJsonAsync<TestResultDTO>();
+
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return new TestResultDTO();
     }
 }

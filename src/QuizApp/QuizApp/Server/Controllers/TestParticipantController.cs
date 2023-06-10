@@ -9,7 +9,7 @@ namespace QuizApp.Server.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Administrator")]
+[Authorize]
 public class TestParticipantController : ControllerBase
 {
     private readonly ITestParticipantRepository _testParticipantRepository;
@@ -33,6 +33,7 @@ public class TestParticipantController : ControllerBase
 
     [HttpGet]
     [Route("participants/{groupId:guid}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<ActionResult<List<TestParticipant>>> GetTestParticipantsByGroupId(Guid groupId)
     {
         var group = await _groupRepository.GetGroupByIdAsync(groupId);
@@ -47,6 +48,7 @@ public class TestParticipantController : ControllerBase
 
     [HttpGet]
     [Route("{id:guid}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> GetTestParticipantById(Guid id)
     {
         var testParticipant = await _testParticipantRepository.GetTestParticipantByIdAsync(id);
@@ -61,14 +63,27 @@ public class TestParticipantController : ControllerBase
 
     [HttpGet]
     [Route("participants/{testId:guid}/{groupId:guid}")]
-    public async Task<ActionResult<List<TestParticipant>>> GetTestParticipantByTestIdByGroupIdAsync(Guid testId, Guid groupId)
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<List<TestParticipant>>> GetTestParticipantsByTestIdByGroupIdAsync(Guid testId, Guid groupId)
     {
-        var testParticipants = await _testParticipantRepository.GetTestParticipantByTestIdByGroupIdAsync(testId, groupId);
+        var testParticipants = await _testParticipantRepository.GetTestParticipantsByTestIdByGroupIdAsync(testId, groupId);
 
         return Ok(testParticipants);
     }
 
+    [HttpGet]
+    [Route("/participantforuser/{testId:guid}")]
+    [Authorize(Roles = "Student")]
+    public async Task<TestParticipantInformationDTO?> GetTestParticipantInfoByTestIdForUser(Guid testId)
+    {
+        var currentUser = _userRepository.GetCurrentUserId();
+        var participantInfo = await _testParticipantRepository.GetTestParticipantByTestIdByUserIdAsync(testId, currentUser);
+
+        return _mapper.Map<TestParticipantInformationDTO>(participantInfo);
+    }
+
     [HttpPost("addtestparticipants/{testId:guid}/{groupId:guid}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> AddTestParticipantsByGroupId(Guid testId, Guid groupId)
     {
         var test = await _testRepository.GetTestByIdAsync(testId);
@@ -85,6 +100,7 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpPost("deletetestparticipants/{testId:guid}/{groupId:guid}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteTestParticipantsByGroupI(Guid testId, Guid groupId)
     {
         var test = await _testRepository.GetTestByIdAsync(testId);
@@ -101,6 +117,7 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> UpdateTest(TestParticipantInformationDTO testParticipantDTO)
     {
         var currentUserId = _userRepository.GetCurrentUserId();
@@ -119,6 +136,7 @@ public class TestParticipantController : ControllerBase
     }
 
     [HttpDelete("{testId:guid}/{groupId:guid}")]
+    [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteTestParticipant(Guid testId, Guid groupId)
     {
 

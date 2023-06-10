@@ -16,19 +16,52 @@
                     else
                     {
                         <PageTitle>Тест @test.Name</PageTitle>
-                        <h3>Тест @test.Name</h3>
+                        <h3>Тест</h3>
 
                         <br />
 
-                        <div class="form-group mb-4">
-                            <label for="testName">Назва</label>
-                            <InputText id="testName" @bind-Value="test.Name" disabled class="form-control form-control-lg"></InputText>
-                        </div>
-                        <br />
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Назва</th>
+                                        <th>Кількість питань</th>
+                                        <th>Оцінка</th>
+                                        <th>Дата здічі студентом</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="text-nowrap align-middle">
+                                        <td width="30%" class="text-truncate" style="max-width: 100px;">@test.Name</td>
+                                        <td width="30%" class="text-truncate" style="max-width: 100px;">@numberOfQuestions</td>
+                                        @if (testInformation?.Grade == null)
+                                        {
+                                            <td width="11%" class="text-truncate" style="max-width: 100px;"></td>
+                                            <td width="29%"></td>
+                                        }
+                                        else
+                                        {
+                                            <td width="11%">@testInformation.Grade/@numberOfQuestions</td>
+                                            <td width="29%">@testInformation.FinishedAt?.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                        }
 
-                        <div class="d-flex">
-                            <button type="button" class="btn btn-danger btn-lg m-1" @onclick="StartTest">Видалити тест</button>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+
+                        if (testInformation?.Grade == null)
+                        {
+                            <div class="d-flex">
+                                <button type="button" class="btn btn-success btn-lg m-1" @onclick="StartTest">Розпочати тест</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex">
+                                <button type="button" class="btn btn-success btn-lg m-1" disabled @onclick="StartTest">Розпочати тест</button>
+                            </div>
+                        }
                     }
                 </div>
             </div>

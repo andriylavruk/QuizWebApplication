@@ -65,10 +65,10 @@ public class TestController : ControllerBase
             return BadRequest();
         }
 
-        var participant = await _testParticipantRepository.GetTestParticipantByTestIdAsync(testId);
+        var participant = await _testParticipantRepository.GetTestParticipantByTestIdByUserIdAsync(testId, currentUserId);
         var questionsForTestParticipant = await _questionRepository.GetQuestionsForTestParticipantAsync(participant!.Id);
 
-        if (currentUserId != participant!.UserId || test.Id != participant.TestId)
+        if (participant == null || test.Id != participant.TestId)
         {
             return BadRequest("This user does not have access to this test.");
         }
@@ -80,7 +80,7 @@ public class TestController : ControllerBase
 
         if(participant.StartedAt == null)
         {
-            participant.StartedAt = DateTime.UtcNow;
+            participant.StartedAt = DateTime.Now;
         }
 
         await _testParticipantRepository.UpdateTestParticipantAsync(participant, currentUserId);
@@ -91,7 +91,7 @@ public class TestController : ControllerBase
     [HttpPost]
     [Route("/finishTest/{testId:guid}")]
     [Authorize(Roles = "Student")]
-    public async Task<ActionResult<List<TestResultDTO>>> FinishTest(Guid testId, AnswersToQuestionsDTO answersToQuestionsDTO)
+    public async Task<ActionResult<TestResultDTO>> FinishTest(Guid testId, List<QuestionForTestParticipantDTO> questionForTestParticipantDTOs)
     {
         var currentUserId = _userRepository.GetCurrentUserId();
         var test = await _testRepository.GetTestByIdAsync(testId);
@@ -101,18 +101,12 @@ public class TestController : ControllerBase
             return BadRequest();
         }
 
-        var participant = await _testParticipantRepository.GetTestParticipantByTestIdAsync(testId);
+        var participant = await _testParticipantRepository.GetTestParticipantByTestIdByUserIdAsync(testId, currentUserId);
 
-        if (testId != answersToQuestionsDTO.TestId
-            || answersToQuestionsDTO.TestId != participant!.TestId
-            || participant.UserId != currentUserId
-            || answersToQuestionsDTO.UserId != participant.UserId
-            || test.Id != participant.TestId)
+        if (participant == null || test.Id != participant.TestId)
         {
             return BadRequest("This user does not have access to this test.");
         }
-
-        var questionsForTestParticipant = await _questionRepository.GetQuestionsForTestParticipantAsync(participant!.Id);
 
         if (participant.StartedAt == null)
         {
@@ -124,9 +118,9 @@ public class TestController : ControllerBase
             return BadRequest("The test has already been completed.");
         }
 
-        var grade = await _questionRepository.CalculateGrade(answersToQuestionsDTO);
+        var grade = await _questionRepository.CalculateGrade(test.Id, questionForTestParticipantDTOs);
 
-        participant.FinishedAt = DateTime.UtcNow;
+        participant.FinishedAt = DateTime.Now;
         participant.Grade = grade;
 
         await _testParticipantRepository.UpdateTestParticipantAsync(participant, currentUserId);
@@ -136,7 +130,7 @@ public class TestController : ControllerBase
             User = _mapper.Map<UserDTO>(await _userRepository.GetUserByIdAsync(currentUserId)),
             Test = test,
             Grade = grade,
-            NumberOfQuestions = questionsForTestParticipant.Count
+            NumberOfQuestions = questionForTestParticipantDTOs.Count
         };
 
         return Ok(testResult);

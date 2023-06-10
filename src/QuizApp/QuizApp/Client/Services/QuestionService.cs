@@ -46,6 +46,13 @@ public class QuestionService : IQuestionService
         }
     }
 
+    public async Task<int> GetNumberOfQuestionsByTetsIdForStudent(Guid testId)
+    {
+        var httpResponse = await _httpClient.GetAsync($"/numberofquestionsintestforuser/{testId}");
+
+        return await httpResponse.Content.ReadFromJsonAsync<int>();
+    }
+
     public async Task CreateQuestion(Question question)
     {
         var result = await _httpClient.PostAsJsonAsync("api/question", question);

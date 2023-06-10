@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
-using QuizApp.Shared.DTO;
 using QuizApp.Shared.Models;
 
 namespace QuizApp.Server.Repositories;

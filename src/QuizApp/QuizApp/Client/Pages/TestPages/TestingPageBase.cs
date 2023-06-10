@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using QuizApp.Client.Pages.QuestionPages;
-using QuizApp.Client.Services;
 using QuizApp.Client.Services.Interfaces;
 using QuizApp.Shared.DTO;
-using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.TestPages;
 
-public class TestInfoPageBase : ComponentBase
+public class TestingPageBase : ComponentBase
 {
     [Parameter]
     public Guid Id { get; set; }
@@ -17,20 +14,14 @@ public class TestInfoPageBase : ComponentBase
     public ITestService testService { get; set; }
 
     [Inject]
-    public IQuestionService questionService { get; set; }
-
-    [Inject]
-    public ITestParticipantService testParticipantService { get; set; }
-
-    [Inject]
     public NavigationManager NavigationManager { get; set; }
-
-    public Test test = new Test();
-    public TestParticipantInformationDTO? testInformation { get; set; }
-    public int numberOfQuestions { get; set; }
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
+
+    public List<QuestionForTestParticipantDTO>? questionForTestParticipantDTOs { get; set; }
+
+    public TestResultDTO testResultDTO { get; set; }
 
     protected bool _signInSuccessful = false;
 
@@ -61,14 +52,13 @@ public class TestInfoPageBase : ComponentBase
     {
         if (Id != Guid.Empty)
         {
-            test = await testService.GetTestByIdForUser(Id);
-            testInformation = await testParticipantService.GetTestParticipantInfoByTestIdForUser(Id);
-            numberOfQuestions = await questionService.GetNumberOfQuestionsByTetsIdForStudent(Id);
+            questionForTestParticipantDTOs = await testService.StartTest(Id);
         }
     }
 
-    protected void StartTest()
+    protected async Task FinishTest()
     {
-        NavigationManager.NavigateTo($"/testing/{Id}");
+        testResultDTO = await testService.FinishTest(Id, questionForTestParticipantDTOs);
+        NavigationManager.NavigateTo($"/testresult/{Id}");
     }
 }

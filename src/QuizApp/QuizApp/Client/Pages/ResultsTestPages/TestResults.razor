@@ -53,7 +53,7 @@
                                                 <td width="4%">@counter</td>
                                                 <td width="30%" class="text-truncate" style="max-width: 100px;">@testParticipant.User?.LastName</td>
                                                 <td width="30%" class="text-truncate" style="max-width: 100px;">@testParticipant.User?.FirstName</td>
-                                                <td width="25%">@testParticipant.FinishedAt?.ToString("MM/dd/yyyy HH:mm:ss")</td>
+                                                <td width="25%">@testParticipant.FinishedAt?.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                                 @if (testParticipant.Grade == null)
                                                 {
                                                     <td width="11%" class="text-truncate" style="max-width: 100px;"></td>

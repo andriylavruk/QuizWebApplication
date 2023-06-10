@@ -1,4 +1,5 @@
 ﻿using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.DTO;
 using QuizApp.Shared.Models;
 using System.Net.Http.Json;
 
@@ -30,6 +31,20 @@ public class TestParticipantService : ITestParticipantService
         }
 
         return TestParticipants;
+    }
+
+    public async Task<TestParticipantInformationDTO?> GetTestParticipantInfoByTestIdForUser(Guid testId)
+    {
+        var result = await _httpClient.GetFromJsonAsync<TestParticipantInformationDTO>($"/participantforuser/{testId}");
+
+        if (result != null)
+        {
+            return result;
+        }
+        else
+        {
+            throw new Exception("TestParticipantInformationDTO not found.");
+        }
     }
 
     public async Task AddTestParticipantsByGroupId(Guid testId, Guid groupId)

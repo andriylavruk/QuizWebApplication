@@ -27,7 +27,7 @@ public class TestParticipantRepository : ITestParticipantRepository
         return await _context.TestParticipants.FirstOrDefaultAsync(r => r.Id == id);
     }
 
-    public async Task<List<TestParticipant>> GetTestParticipantByTestIdByGroupIdAsync(Guid testId, Guid groupId)
+    public async Task<List<TestParticipant>> GetTestParticipantsByTestIdByGroupIdAsync(Guid testId, Guid groupId)
     {
         return await _context.TestParticipants
             .Include(x => x.User)
@@ -35,11 +35,11 @@ public class TestParticipantRepository : ITestParticipantRepository
             .ToListAsync();
     }
 
-    public async Task<TestParticipant?> GetTestParticipantByTestIdAsync(Guid testId)
+    public async Task<TestParticipant?> GetTestParticipantByTestIdByUserIdAsync(Guid testId, Guid userId)
     {
         return await _context.TestParticipants
             .Include(x => x.Test)
-            .FirstOrDefaultAsync(x => x.TestId == testId);
+            .FirstOrDefaultAsync(x => x.TestId == testId && x.UserId == userId);
     }
 
     public async Task<bool> IsTestParticipantExistAsync(Guid id)

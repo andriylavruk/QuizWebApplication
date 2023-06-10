@@ -10,7 +10,7 @@ public interface IQuestionRepository
     Task<List<Question>> GetQuestionsByTestIdAsync(Guid testId);
     Task<Question?> GetQuestionByIdAsync(Guid questionId);
     Task<bool> IsQuestionExistAsync(Guid id);
-    Task<int> CalculateGrade(AnswersToQuestionsDTO answersToQuestionsDTO);
+    Task<int> CalculateGrade(Guid testId, List<QuestionForTestParticipantDTO> questionForTestParticipantDTOs);
     Task<bool> CreateQuestionAsync(Question question);
     Task<bool> UpdateQuestionAsync(Question question);
     Task<bool> DeleteQuestionAsync(Question question);
