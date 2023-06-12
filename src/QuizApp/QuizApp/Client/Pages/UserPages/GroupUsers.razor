@@ -1,0 +1,71 @@
+﻿@page "/groupusers/{id:guid}"
+
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Administrator")]
+@inherits GroupUsersBase
+
+<PageTitle>Студентив в групі</PageTitle>
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                            <h3>Студенти групи "@Group?.Name"</h3>
+                        </div>
+
+                        @if (userService.Users == null)
+                        {
+                            <p><em>Завантаження...</em></p>
+                        }
+                        else if (userService.Users.Count == 0)
+                        {
+                            <p>Немає студентів.</p>
+                        }
+                        else
+                        {
+                            var counter = 1;
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Прізвище</th>
+                                            <th>Ім'я</th>
+                                            <th>Опції</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in userService.Users)
+                                        {
+                                            <tr class="text-nowrap align-middle">
+                                                <td width="4%">@counter</td>
+                                                <td width="45%" class="text-truncate" style="max-width: 100px;">@user.LastName</td>
+                                                <td width="50%" class="text-truncate" style="max-width: 100px;">@user.FirstName</td>
+                                                <td width="1%">
+                                                    <button class="btn alert-danger" @onclick="(() => DeleteUserFromGroup(user.Id))"><i class="oi oi-trash"></i></button>
+                                                </td>
+                                            </tr>
+
+                                            counter++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

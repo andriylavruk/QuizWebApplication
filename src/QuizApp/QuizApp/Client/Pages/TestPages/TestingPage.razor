@@ -1,0 +1,74 @@
+﻿@page "/testing/{id:guid}"
+
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Student")]
+@inherits TestingPageBase
+@inject HttpClient Http
+
+<PageTitle>Тестування</PageTitle>
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                            <h3>Питання тесту "@Test?.Name"</h3>
+                        </div>
+
+                        @if (questionForTestParticipantDTOs == null)
+                        {
+                            <p><em>Завантаження...</em></p>
+                        }
+                        else if (questionForTestParticipantDTOs.Count == 0)
+                        {
+                            <p>Немає питань у тесті.</p>
+                        }
+                        else
+                        {
+                            var counter = 1;
+
+                            @foreach (var question in questionForTestParticipantDTOs)
+                            {
+                                var j = 1;
+                                <div class="card shadow-lg mb-3" style="border-radius: 15px; background-color:whitesmoke;">
+                                    <div class="card-body">
+                                        <label for="question">@counter. @question.Description</label><br />
+                                        <InputRadioGroup id="question" @bind-Value="question.RightAnswer" class="form-control">
+                                            @foreach (var opt in question.Options)
+                                            {
+                                                var guidId = Guid.NewGuid();
+                                                <div class="form-check m-2">
+                                                    <InputRadio class="form-check-input" type="radio" id="@guidId" Value="j" />
+                                                    <label for="@guidId">
+                                                        @opt
+                                                    </label>
+                                                </div>
+                                                j++;
+                                            }
+                                        </InputRadioGroup>
+                                    </div>
+                                </div>
+
+                                counter++;
+                            }
+
+                            <br />
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                                <button class="btn btn-success btn-lg" @onclick="FinishTest">Завершити тест</button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

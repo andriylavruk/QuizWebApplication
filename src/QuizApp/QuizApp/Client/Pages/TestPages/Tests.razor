@@ -1,0 +1,84 @@
+﻿@page "/tests"
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Administrator, Student")]
+@inherits TestsBase
+
+<PageTitle>Тести</PageTitle>
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                            <h3>Тести</h3>
+                            <AuthorizeView Roles="Administrator">
+                                <Authorized>
+                                    <button class="btn btn-success btn-lg" @onclick="CreateTest">Створити тест</button>
+                                </Authorized>
+                            </AuthorizeView>
+                        </div>
+
+                        @if (testService.Tests == null)
+                        {
+                            <p><em>Завантаження...</em></p>
+                        }
+                        else if (testService.Tests.Count == 0)
+                        {
+                            <p>Немає тестів.</p>
+                        }
+                        else
+                        {
+                            var counter = 1;
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Назва</th>
+                                            <th>Опції</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var test in testService.Tests)
+                                        {
+                                            <tr class="text-nowrap align-middle">
+                                                <td width="4%">@counter</td>
+                                                <td width="91%" class="text-truncate" style="max-width: 100px;">@test.Name</td>
+                                                <td width="5%">
+                                                    <AuthorizeView Roles="Administrator">
+                                                        <Authorized>
+                                                            <button class="btn alert-success" @onclick="(() => ShowTestQuestions(test.Id))"><i class="oi oi-book"></i></button>
+                                                            <button class="btn alert-primary" @onclick="(() => ShowTestGroups(test.Id))"><i class="oi oi-people"></i></button>
+                                                            <button class="btn alert-warning" @onclick="(() => EditTest(test.Id))"><i class="oi oi-pencil"></i></button>
+                                                            <button class="btn alert-danger" @onclick="(() => DeleteTest(test.Id))"><i class="oi oi-trash"></i></button>
+                                                        </Authorized>
+                                                    </AuthorizeView>
+                                                    <AuthorizeView Roles="Student">
+                                                        <Authorized>
+                                                            <button class="btn alert-success" @onclick="(() => ShowTestInfo(test.Id))"><i class="oi oi-book"></i></button>
+                                                        </Authorized>
+                                                    </AuthorizeView>
+                                                </td>
+                                            </tr>
+
+                                            counter++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

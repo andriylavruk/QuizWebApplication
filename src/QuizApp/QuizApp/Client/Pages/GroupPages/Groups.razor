@@ -1,0 +1,70 @@
+﻿@page "/groups"
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Administrator")]
+@inherits GroupsBase
+
+<PageTitle>Групи</PageTitle>
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                            <h3>Групи</h3>
+                            <button class="btn btn-success btn-lg" @onclick="CreateGroup">Створити групу</button>
+                        </div>
+
+                        @if (groupService.Groups == null)
+                        {
+                            <p><em>Завантаження...</em></p>
+                        }
+                        else if (groupService.Groups.Count == 0)
+                        {
+                            <p>Немає груп.</p>
+                        }
+                        else
+                        {
+                            var counter = 1;
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>№</th>
+                                            <th>Назва</th>
+                                            <th>Опції</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var group in groupService.Groups)
+                                        {
+                                            <tr class="text-nowrap align-middle">
+                                                <td width="4%">@counter</td>
+                                                <td width="87%" class="text-truncate" style="max-width: 100px;">@group.Name</td>
+                                                <td width="9%">
+                                                    <button class="btn alert-primary" @onclick="(() => ShowGroupUsers(group.Id))"><i class="oi oi-person"></i></button>
+                                                    <button class="btn alert-warning" @onclick="(() => EditGroup(group.Id))"><i class="oi oi-pencil"></i></button>
+                                                    <button class="btn alert-danger" @onclick="(() => DeleteGroup(group.Id))"><i class="oi oi-trash"></i></button>
+                                                </td>
+                                            </tr>
+
+                                            counter++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

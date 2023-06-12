@@ -1,0 +1,55 @@
+﻿@page "/test"
+@page "/test/{id:guid}"
+@using Microsoft.AspNetCore.Authorization;
+
+@attribute [Authorize(Roles = "Administrator")]
+@inherits TestPageBase
+
+<div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                <div class="card-body p-5">
+                    @if (_signInSuccessful == false)
+                    {
+                        <h3>Ви не авторизовані.</h3>
+                    }
+                    else
+                    {
+                        @if (Id == Guid.Empty)
+                        {
+                            <PageTitle>Створити тест</PageTitle>
+                            <h3>Створити тест</h3>
+                        }
+                        else
+                        {
+                            <PageTitle>Редагувати тест</PageTitle>
+                            <h3>Редагувати тест</h3>
+                        }
+
+                        <br />
+
+                        <EditForm Model="test" OnValidSubmit="HandleSubmit">
+                            <DataAnnotationsValidator></DataAnnotationsValidator>
+                            <div class="form-group mb-4">
+                                <label for="testName">Назва</label>
+                                <InputText id="testName" @bind-Value="test.Name" class="form-control form-control-lg"></InputText>
+                                <ValidationMessage For="@(() => test.Name)"></ValidationMessage>
+                            </div>
+                            <br />
+
+                             <div class="d-flex">
+                                <button type="submit" class="btn btn-success btn-lg m-1">@btnText</button>
+                                @if (Id != Guid.Empty)
+                                {
+                                    <button type="button" class="btn btn-danger btn-lg m-1" @onclick="DeleteTest">Видалити тест</button>
+                                }
+                             </div>
+                            
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,55 @@
+﻿@page "/signin"
+@inherits SignInBase
+
+@if (_signInSuccessful == false)
+{
+    <div class="container py-5 h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-12 col-md-9 col-lg-7 col-xl-6">
+                <div class="card shadow-lg" style="border-radius: 15px; background-color:whitesmoke;">
+                    <div class="card-body p-5">
+
+                        <h3 class="text-center">Вхід у систему</h3>
+                        <br />
+
+                        <EditForm Model="_userToSignIn" OnValidSubmit="SignInUser">
+                            <DataAnnotationsValidator></DataAnnotationsValidator>
+
+                            <div class="form-group mb-4">
+                                <label class="label-name" for="email">Електронна адреса:</label>
+                                <InputText @bind-Value="_userToSignIn.Email" id="email" class="form-control form-control-lg" />
+                                <ValidationMessage For="@(() => _userToSignIn.Email)" />
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label class="label-name" for="password">Пароль:</label>
+                                <InputText @bind-Value="_userToSignIn.Password" type="password" id="password" class="form-control form-control-lg" />
+                                <ValidationMessage For="@(() => _userToSignIn.Password)" />
+                            </div>
+
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary btnSubmit buttonText btn-lg">Увійти</button>
+                            </div>
+
+                            @if (_attemptToSignInFailed == true)
+                            {
+                                <p class="text-danger">Помилка входу. Перевірте введені дані.</p>
+                            }
+
+                            <hr class="my-4">
+                            <div>
+                                <p class="mb-0">Немає акаунта? <a class="text-dark" href="register" style="color:darkgrey"> Зареєструватися</a></p>
+                            </div>
+
+                        </EditForm>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    NavigationManager.NavigateTo("/", true);
+}
