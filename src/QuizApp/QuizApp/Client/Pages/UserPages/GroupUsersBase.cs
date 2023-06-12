@@ -17,6 +17,9 @@ public class GroupUsersBase : ComponentBase
     public IGroupService groupService { get; set; }
 
     [Inject]
+    public ITestParticipantService testParticipantService { get; set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     [CascadingParameter]
@@ -53,8 +56,10 @@ public class GroupUsersBase : ComponentBase
 
     protected async Task DeleteUserFromGroup(Guid userId)
     {
+        await testParticipantService.DeleteTestParticipantByGroupIdByUserId(Id, userId);
         await groupService.UnsetUserGroup(userId);
-        await groupService.GetGroupById(Id);
-        NavigationManager.NavigateTo($"/groupusers/{Id}", true);
+        await userService.GetUsersByGroupId(Id);
+        Group = await groupService.GetGroupById(Id);
+        NavigationManager.NavigateTo($"/groupusers/{Id}");
     }
 }

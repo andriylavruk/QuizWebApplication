@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.GroupPages;
 
@@ -13,7 +14,12 @@ public class TestGroupsBase : ComponentBase
     public IGroupService groupService { get; set; }
 
     [Inject]
+    public ITestService testService { get; set; }
+
+    [Inject]
     public ITestParticipantService testParticipantService { get; set; }
+
+    public Test? Test {get; set;}
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -35,6 +41,7 @@ public class TestGroupsBase : ComponentBase
             {
                 _signInSuccessful = true;
                 await groupService.GetGroupsByTestId(Id);
+                Test = await testService.GetTestById(Id);
             }
             else
             {
@@ -64,7 +71,7 @@ public class TestGroupsBase : ComponentBase
 
     protected async Task DeleteGroupFromTest(Guid groupId)
     {
-        await testParticipantService.DeleteTestParticipantsByGroupId(Id, groupId);
+        await testParticipantService.DeleteTestParticipantsByTestIdByGroupId(Id, groupId);
         await groupService.GetGroupsByTestId(Id);
         NavigationManager.NavigateTo($"/testgroups/{Id}");
     }

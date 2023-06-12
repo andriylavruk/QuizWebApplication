@@ -40,19 +40,27 @@
                                         <option selected value="">Вибрати групу</option>
                                     }
 
-                                    @foreach (var group in groupService.Groups)
+                                    @if (groupService.Groups == null)
                                     {
-                                        <option value="@group.Id">@group.Name</option>
+
+                                        <option selected value="">Вибрати групу</option>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var group in groupService.Groups)
+                                        {
+                                            <option value="@group.Id">@group.Name</option>
+                                        }
                                     }
                                 </InputSelect>
                                 <ValidationMessage For="@(() => user.GroupId)"></ValidationMessage>
                             </div>
                             <br />
 
-                             <div class="d-flex">
+                            <div class="d-flex">
                                 <button type="submit" class="btn btn-success btn-lg m-1">Оновити</button>
-                             </div>
-                            
+                            </div>
+
                         </EditForm>
                     }
                 </div>

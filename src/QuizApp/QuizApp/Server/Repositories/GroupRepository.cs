@@ -2,8 +2,6 @@
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace QuizApp.Server.Repositories;
 
@@ -155,7 +153,31 @@ public class GroupRepository : IGroupRepository
     {
         if (group != null)
         {
-            _context.Remove(group!);
+            var groupUsers = await _context.Users.Where(x => x.GroupId == group.Id).ToListAsync();
+
+            if (groupUsers.Count > 0)
+            {
+                groupUsers.ForEach(x =>
+                {
+                    x.Group = null;
+                    x.GroupId = null;
+                });
+
+                _context.Users.UpdateRange(groupUsers);
+                await _context.SaveChangesAsync();
+
+                var testParticipants = await _context.TestParticipants
+                    .Include(x => x.User)
+                    .Where(x => x.User!.GroupId == null)
+                    .ToListAsync();
+
+                if(testParticipants.Count > 0 || testParticipants != null)
+                {
+                    _context.TestParticipants.RemoveRange(testParticipants);
+                }
+            }    
+
+            _context.Groups.Remove(group!);
             await _context.SaveChangesAsync();
 
             return true;

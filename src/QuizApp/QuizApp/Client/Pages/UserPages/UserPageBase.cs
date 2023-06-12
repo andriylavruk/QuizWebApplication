@@ -17,6 +17,9 @@ public class UserPageBase : ComponentBase
     public IUserService userService { get; set; }
 
     [Inject]
+    public ITestParticipantService testParticipantService { get; set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
 
     public UserDTO user = new UserDTO();
@@ -61,6 +64,7 @@ public class UserPageBase : ComponentBase
     protected async Task UpdateUser()
     {
         await groupService.SetUserGroup(user.Id, new Guid(user.GroupId.ToString()!));
+        await testParticipantService.AddTestParticipantByGroupIdByUserId(new Guid(user.GroupId.ToString()!), user.Id);
         NavigationManager.NavigateTo("/studentswithoutgroup");
     }
 }

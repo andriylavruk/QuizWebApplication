@@ -94,14 +94,14 @@ public class TestParticipantController : ControllerBase
             return BadRequest();
         }
 
-        await _testParticipantRepository.AddTestParticipantsByGroupIdAsync(testId, groupId);
+        await _testParticipantRepository.AddTestParticipantsByTestIdByGroupIdAsync(testId, groupId);
 
         return Ok();
     }
 
-    [HttpPost("deletetestparticipants/{testId:guid}/{groupId:guid}")]
+    [HttpDelete("deletetestparticipants/{testId:guid}/{groupId:guid}")]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> DeleteTestParticipantsByGroupI(Guid testId, Guid groupId)
+    public async Task<IActionResult> DeleteTestParticipantsByGroupId(Guid testId, Guid groupId)
     {
         var test = await _testRepository.GetTestByIdAsync(testId);
         var group = await _groupRepository.GetGroupByIdAsync(groupId);
@@ -111,14 +111,32 @@ public class TestParticipantController : ControllerBase
             return BadRequest();
         }
 
-        await _testParticipantRepository.DeleteTestParticipantsByGroupIdAsync(testId, groupId);
+        await _testParticipantRepository.DeleteTestParticipantsByTestIdByGroupIdAsync(testId, groupId);
+
+        return NoContent();
+    }
+
+    [HttpPost("{groupId:guid}/{userId:guid}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> AddTestParticipant(Guid groupId, Guid userId)
+    {
+
+        var group = await _groupRepository.GetGroupByIdAsync(groupId);
+        var user = await _userRepository.GetUserByIdAsync(userId);
+
+        if (group == null || user == null)
+        {
+            return NotFound();
+        }
+
+        await _testParticipantRepository.AddTestParticipantByGroupIdByUserIdAsync(groupId, userId);
 
         return Ok();
     }
 
     [HttpPut]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> UpdateTest(TestParticipantInformationDTO testParticipantDTO)
+    public async Task<IActionResult> UpdateTestParticipant(TestParticipantInformationDTO testParticipantDTO)
     {
         var currentUserId = _userRepository.GetCurrentUserId();
         var participant = await _testParticipantRepository.GetTestParticipantByIdAsync(testParticipantDTO.Id);
@@ -135,22 +153,19 @@ public class TestParticipantController : ControllerBase
         return Ok();
     }
 
-    [HttpDelete("{testId:guid}/{groupId:guid}")]
+    [HttpDelete("{groupId:guid}/{userId:guid}")]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> DeleteTestParticipant(Guid testId, Guid groupId)
+    public async Task<IActionResult> DeleteTestParticipant(Guid groupId, Guid userId)
     {
+        var isGroupExist = await _groupRepository.IsGroupExistAsync(groupId);
+        var isUserExist = await _userRepository.IsUserExistAsync(userId);
 
-        var test = await _testRepository.GetTestByIdAsync(testId);
-        var group = await _groupRepository.GetGroupByIdAsync(groupId);
-
-        if (test == null || group == null)
+        if (isGroupExist == false || isUserExist == false)
         {
             return NotFound();
         }
 
-        await _testParticipantRepository.AddTestParticipantsByGroupIdAsync(testId, groupId);
-
-        var deleted = await _testParticipantRepository.DeleteTestParticipantsByGroupIdAsync(testId, groupId);
+        var deleted = await _testParticipantRepository.DeleteTestParticipantByGroupIdByUserIdAsync(groupId, userId);
 
         if (deleted)
         {

@@ -80,7 +80,7 @@ public class QuestionRepository : IQuestionRepository
         var questions =
             from qst in await _context.Questions.Where(x => x.TestId == testId).ToListAsync()
             join ans in questionForTestParticipantDTOs on qst.Id equals ans.Id
-            where qst.RightAnswer == ans.RightAnswer + 1
+            where qst.RightAnswer == ans.RightAnswer
             select qst;
 
         var questionsResult = questions.ToList();

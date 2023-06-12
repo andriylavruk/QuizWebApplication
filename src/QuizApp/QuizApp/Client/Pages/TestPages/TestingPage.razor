@@ -20,7 +20,7 @@
                     else
                     {
                         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
-                            <h3>Питання</h3>
+                            <h3>Питання тесту "@Test?.Name"</h3>
                         </div>
 
                         @if (questionForTestParticipantDTOs == null)
@@ -34,36 +34,37 @@
                         else
                         {
                             var counter = 1;
-                            <EditForm Model="questionForTestParticipantDTOs" OnValidSubmit="FinishTest">
-                               
-                                @foreach (var question in questionForTestParticipantDTOs)
-                                {
-                                    <div class="card shadow-lg mb-3" style="border-radius: 15px; background-color:whitesmoke;">
-                                        <div class="card-body">
-                                            <label for="question">@counter. @question.Description</label><br />
-                                            <InputRadioGroup id="question" @bind-Value="question.RightAnswer" class="form-control">
-                                                @foreach (var opt in question.Options)
-                                                {
-                                                    <div class="form-check m-2">
-                                                        <InputRadio class="form-check-input" type="radio" id="@opt" Value="@opt" />
-                                                        <label for="@opt">
-                                                            @opt
-                                                        </label>
-                                                    </div>
-                                                }
-                                            </InputRadioGroup>
-                                        </div>
+
+                            @foreach (var question in questionForTestParticipantDTOs)
+                            {
+                                var j = 1;
+                                <div class="card shadow-lg mb-3" style="border-radius: 15px; background-color:whitesmoke;">
+                                    <div class="card-body">
+                                        <label for="question">@counter. @question.Description</label><br />
+                                        <InputRadioGroup id="question" @bind-Value="question.RightAnswer" class="form-control">
+                                            @foreach (var opt in question.Options)
+                                            {
+                                                var guidId = Guid.NewGuid();
+                                                <div class="form-check m-2">
+                                                    <InputRadio class="form-check-input" type="radio" id="@guidId" Value="j" />
+                                                    <label for="@guidId">
+                                                        @opt
+                                                    </label>
+                                                </div>
+                                                j++;
+                                            }
+                                        </InputRadioGroup>
                                     </div>
-
-                                    counter++;
-                                }
-
-                                <br />
-
-                                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
-                                    <button class="btn btn-success btn-lg" @onclick="FinishTest">Завершити тест</button>
                                 </div>
-                            </EditForm>
+
+                                counter++;
+                            }
+
+                            <br />
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between mb-4">
+                                <button class="btn btn-success btn-lg" @onclick="FinishTest">Завершити тест</button>
+                            </div>
                         }
                     }
                 </div>

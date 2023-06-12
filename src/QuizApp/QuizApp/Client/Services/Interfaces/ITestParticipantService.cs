@@ -9,6 +9,8 @@ public interface ITestParticipantService
 
     Task<List<TestParticipant>> GetTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId);
     Task<TestParticipantInformationDTO?> GetTestParticipantInfoByTestIdForUser(Guid testId);
-    Task AddTestParticipantsByGroupId(Guid testId, Guid groupId);
-    Task DeleteTestParticipantsByGroupId(Guid testId, Guid groupId);
+    Task AddTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId);
+    Task AddTestParticipantByGroupIdByUserId(Guid groupId, Guid userId);
+    Task DeleteTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId);
+    Task DeleteTestParticipantByGroupIdByUserId(Guid groupId, Guid userId);
 }

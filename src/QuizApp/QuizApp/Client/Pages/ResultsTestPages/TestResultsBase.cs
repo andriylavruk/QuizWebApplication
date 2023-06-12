@@ -20,7 +20,12 @@ public class TestResultsBase : ComponentBase
     public IQuestionService questionService { get; set; }
 
     [Inject]
+    public ITestService testService { get; set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    public Test? Test { get; set; }
 
     private List<Question> testQuestions { get; set; }
 
@@ -45,6 +50,7 @@ public class TestResultsBase : ComponentBase
                 await testParticipantService.GetTestParticipantsByTestIdByGroupId(testId, groupId);
                 testQuestions = await questionService.GetQuestionsByTestId(testId);
                 numberOfQuestions = testQuestions.Count;
+                Test = await testService.GetTestById(testId);
             }
             else
             {

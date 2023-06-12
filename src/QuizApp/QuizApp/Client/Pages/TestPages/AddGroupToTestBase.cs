@@ -69,7 +69,7 @@ public class AddGroupToTestBase : ComponentBase
 
     protected async Task AddGroupToTest()
     {
-        await testParticipantService.AddTestParticipantsByGroupId(Id, new Guid(group.Id.ToString()!));
+        await testParticipantService.AddTestParticipantsByTestIdByGroupId(Id, new Guid(group.Id.ToString()!));
         NavigationManager.NavigateTo($"/testgroups/{Id}");
     }
 }

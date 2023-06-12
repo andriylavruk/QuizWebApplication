@@ -47,13 +47,23 @@ public class TestParticipantService : ITestParticipantService
         }
     }
 
-    public async Task AddTestParticipantsByGroupId(Guid testId, Guid groupId)
+    public async Task AddTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId)
     {
         var result = await _httpClient.PostAsync($"api/testparticipant/addtestparticipants/{testId}/{groupId}", null);
     }
 
-    public async Task DeleteTestParticipantsByGroupId(Guid testId, Guid groupId)
+    public async Task AddTestParticipantByGroupIdByUserId(Guid groupId, Guid userId)
     {
-        var result = await _httpClient.PostAsync($"api/testparticipant/deletetestparticipants/{testId}/{groupId}", null);
+        var result = await _httpClient.PostAsync($"api/testparticipant/{groupId}/{userId}", null);
+    }
+
+    public async Task DeleteTestParticipantsByTestIdByGroupId(Guid testId, Guid groupId)
+    {
+        var result = await _httpClient.DeleteAsync($"api/testparticipant/deletetestparticipants/{testId}/{groupId}");
+    }
+
+    public async Task DeleteTestParticipantByGroupIdByUserId(Guid groupId, Guid userId)
+    {
+        var result = await _httpClient.DeleteAsync($"api/testparticipant/{groupId}/{userId}");
     }
 }

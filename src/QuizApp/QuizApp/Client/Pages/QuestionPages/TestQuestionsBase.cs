@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
+using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.QuestionPages;
 
@@ -13,7 +14,12 @@ public class TestQuestionsBase : ComponentBase
     public IQuestionService questionService { get; set; }
 
     [Inject]
+    public ITestService testService { get; set; }
+
+    [Inject]
     public NavigationManager NavigationManager { get; set; }
+
+    public Test? Test { get; set; }
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
@@ -32,6 +38,7 @@ public class TestQuestionsBase : ComponentBase
             {
                 _signInSuccessful = true;
                 await questionService.GetQuestionsByTestId(Id);
+                Test = await testService.GetTestById(Id);
             }
             else
             {

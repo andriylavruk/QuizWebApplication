@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using QuizApp.Server.Data;
 using QuizApp.Server.Repositories.Interfaces;
 using QuizApp.Shared.Models;
@@ -32,6 +33,8 @@ public class TestParticipantRepository : ITestParticipantRepository
         return await _context.TestParticipants
             .Include(x => x.User)
             .Where(x => x.TestId == testId && x.User!.GroupId == groupId)
+            .OrderBy(x => x.User!.LastName)
+            .ThenBy(x => x.User!.FirstName)
             .ToListAsync();
     }
 
@@ -40,6 +43,45 @@ public class TestParticipantRepository : ITestParticipantRepository
         return await _context.TestParticipants
             .Include(x => x.Test)
             .FirstOrDefaultAsync(x => x.TestId == testId && x.UserId == userId);
+    }
+
+    public async Task<IEnumerable<TestParticipant>> GetTestParticipantsByGroupIdByUserIdAsync(Guid groupId, Guid userId)
+    {
+        var group = await _context.Groups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupId);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
+
+        if (group == null || user == null || user.GroupId == null)
+        {
+            return Enumerable.Empty<TestParticipant>();
+        }
+
+        var tests =
+            from test in _context.Tests
+            join testprtc in _context.TestParticipants on test.Id equals testprtc.TestId
+            join grp in _context.Groups on testprtc.User!.GroupId equals grp.Id
+            where grp.Id == groupId
+            group test by test.Id into t
+            select new Test
+            {
+                Id = t.Key,
+                Name = t.FirstOrDefault()!.Name
+            };
+
+        var testsList = await tests.ToListAsync();
+
+        if (testsList.Count == 0)
+        {
+            return Enumerable.Empty<TestParticipant>();
+        }
+
+        var testParticipants = testsList.Select(x => new TestParticipant
+        {
+            Id = Guid.NewGuid(),
+            TestId = x.Id,
+            UserId = user.Id
+        });
+
+        return testParticipants;
     }
 
     public async Task<bool> IsTestParticipantExistAsync(Guid id)
@@ -52,7 +94,22 @@ public class TestParticipantRepository : ITestParticipantRepository
         return testParticipant != null;
     }
 
-    public async Task<bool> AddTestParticipantsByGroupIdAsync(Guid testId, Guid groupId)
+    public async Task<bool> AddTestParticipantByGroupIdByUserIdAsync(Guid groupId, Guid userId)
+    {
+        var testParticipants = await GetTestParticipantsByGroupIdByUserIdAsync(groupId, userId);
+
+        if(testParticipants.IsNullOrEmpty())
+        {
+            return false;
+        }
+
+        await _context.TestParticipants.AddRangeAsync(testParticipants);
+        var result = await _context.SaveChangesAsync();
+
+        return result > 0;
+    }
+
+    public async Task<bool> AddTestParticipantsByTestIdByGroupIdAsync(Guid testId, Guid groupId)
     {
         var testInDB = await _context.Tests.AsNoTracking().FirstOrDefaultAsync(x => x.Id == testId);
         var groupInDB = await _context.Groups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupId);
@@ -61,7 +118,8 @@ public class TestParticipantRepository : ITestParticipantRepository
         {
             return false;
         }
-        var users = await _context.Users
+
+        var testParticipants = await _context.Users
             .Where(x => x.GroupId == groupId)
             .Select(y => new TestParticipant
             {
@@ -71,7 +129,7 @@ public class TestParticipantRepository : ITestParticipantRepository
             })
             .ToArrayAsync();
 
-        await _context.TestParticipants.AddRangeAsync(users);
+        await _context.TestParticipants.AddRangeAsync(testParticipants);
         var result = await _context.SaveChangesAsync();
 
         return result > 0;
@@ -95,7 +153,34 @@ public class TestParticipantRepository : ITestParticipantRepository
         return false;
     }
 
-    public async Task<bool> DeleteTestParticipantsByGroupIdAsync(Guid testId, Guid groupId)
+    public async Task<bool> DeleteTestParticipantByGroupIdByUserIdAsync(Guid groupId, Guid userId)
+    {
+        var group = await _context.Groups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupId);
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId);
+
+
+        if (group == null || user == null)
+        {
+            return false;
+        }
+
+        var testParticipants = await _context.TestParticipants
+            .Include(x => x.User)
+            .Where(x => x.UserId == userId && x.User!.GroupId == groupId)
+            .ToListAsync();
+
+        if (testParticipants.Count == 0)
+        {
+            return false;
+        }
+
+        _context.TestParticipants.RemoveRange(testParticipants);
+        var result = await _context.SaveChangesAsync();
+
+        return result > 0;
+    }
+
+    public async Task<bool> DeleteTestParticipantsByTestIdByGroupIdAsync(Guid testId, Guid groupId)
     {
         var testInDB = await _context.Tests.AsNoTracking().FirstOrDefaultAsync(x => x.Id == testId);
         var groupInDB = await _context.Groups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == groupId);
@@ -105,9 +190,8 @@ public class TestParticipantRepository : ITestParticipantRepository
             return false;
         }
         var testParticipants = await _context.TestParticipants
-            .Where(x => x.TestId == testId)
             .Include(x => x.User)
-            .Where(x => x.User!.GroupId == groupId)
+            .Where(x => x.TestId == testId && x.User!.GroupId == groupId)
             .ToArrayAsync();
 
         _context.TestParticipants.RemoveRange(testParticipants);

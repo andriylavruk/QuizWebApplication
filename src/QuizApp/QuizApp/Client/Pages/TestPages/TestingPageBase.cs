@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using QuizApp.Client.Services.Interfaces;
 using QuizApp.Shared.DTO;
+using QuizApp.Shared.Models;
 
 namespace QuizApp.Client.Pages.TestPages;
 
@@ -19,9 +20,11 @@ public class TestingPageBase : ComponentBase
     [CascadingParameter]
     protected Task<AuthenticationState> AuthenticationState { get; set; }
 
+    public Test? Test { get; set; }
+
     public List<QuestionForTestParticipantDTO>? questionForTestParticipantDTOs { get; set; }
 
-    public TestResultDTO testResultDTO { get; set; }
+public TestResultDTO testResultDTO { get; set; }
 
     protected bool _signInSuccessful = false;
 
@@ -53,12 +56,13 @@ public class TestingPageBase : ComponentBase
         if (Id != Guid.Empty)
         {
             questionForTestParticipantDTOs = await testService.StartTest(Id);
+            Test = await testService.GetTestByIdForUser(Id);
         }
     }
 
     protected async Task FinishTest()
     {
-        testResultDTO = await testService.FinishTest(Id, questionForTestParticipantDTOs);
-        NavigationManager.NavigateTo($"/testresult/{Id}");
+        testResultDTO = await testService.FinishTest(Id, questionForTestParticipantDTOs!);
+        NavigationManager.NavigateTo($"/testinfo/{Id}");
     }
 }
